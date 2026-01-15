@@ -19,6 +19,16 @@
             background-size: cover; background-position: center;
             color: white;
         }
+
+        /* ESTILO DO ÍCONE/LOGO */
+        .app-logo {
+            width: 110px; height: 110px;
+            border-radius: 28px;
+            margin-bottom: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
         .btn-main {
             width: 280px; padding: 16px; border-radius: 14px; border: none;
             background: linear-gradient(135deg, #22d3ee 0%, #a855f7 100%);
@@ -29,56 +39,58 @@
 </head>
 <body>
 
+    <img src="icone.png" alt="BarcoApp Logo" class="app-logo">
+
     <h1 style="font-size:3rem; margin:0;">BarcoApp</h1>
     <p>Instale agora para ver as escalas oficiais.</p>
 
-    <div id="install-area" style="background: rgba(0,0,0,0.6); padding: 25px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1);">
-        <p style="font-size: 0.8rem; font-weight: 800; margin-bottom: 15px;">ESCOLHA SEU CELULAR</p>
+    <div id="install-area" style="background: rgba(0,0,0,0.6); padding: 25px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);">
+        <p style="font-size: 0.8rem; font-weight: 800; margin-bottom: 15px; opacity: 0.7;">ESCOLHA SEU CELULAR</p>
         
         <button id="btnInstall" class="btn-main" style="background: #3ddc84; color: #000; display: flex;">
             <i class="fab fa-android"></i> INSTALAR ANDROID
         </button>
         
-        <button onclick="alert('No iPhone: Toque no ícone de Compartilhar e escolha Adicionar à Tela de Início')" class="btn-main" style="background: #fff; color: #000;">
+        <button onclick="alert('No iPhone: Toque no ícone de Compartilhar (seta para cima) e escolha Adicionar à Tela de Início')" class="btn-main" style="background: #fff; color: #000;">
             <i class="fab fa-apple"></i> INSTALAR IPHONE
         </button>
     </div>
 
-    <a href="app.html" style="color: #94a3b8; margin-top: 30px; text-decoration: none; font-size: 0.9rem;">
+    <a href="app.html" style="color: #22d3ee; margin-top: 35px; text-decoration: none; font-size: 0.9rem; font-weight: 700;">
         Já tenho o App ou quero entrar agora →
     </a>
 
     <script>
-        // Registrar Service Worker
+        // REGISTRO DO SERVICE WORKER
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js');
         }
 
         let deferredPrompt;
 
-        // Captura o evento se ele ocorrer
+        // Captura o evento de instalação se ele disparar
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            console.log("Prompt de instalação capturado e pronto.");
+            console.log("Evento PWA capturado com sucesso.");
         });
 
-        // Lógica do Clique no Botão Fixo
+        // Lógica do Clique no Botão
         document.getElementById('btnInstall').addEventListener('click', async () => {
             if (deferredPrompt) {
-                // Se o Chrome liberou o evento, mostra a janelinha oficial
+                // Se o Android liberar, mostra o prompt oficial
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') {
                     deferredPrompt = null;
                 }
             } else {
-                // SE O EVENTO NÃO DISPAROU (Segunda vez abrindo o link), ensina o manual
+                // SE O BOTÃO "SUMIR" TÉCNICAMENTE (SEGUNDA VEZ), ENSINA O MANUAL
                 alert("Para instalar agora:\n\n1. Clique nos 3 pontinhos do Chrome (topo direito).\n2. Selecione 'Instalar aplicativo' ou 'Adicionar à tela inicial'.");
             }
         });
 
-        // SE O APP JÁ ESTIVER INSTALADO, ESCONDE A ÁREA DE INSTALAÇÃO
+        // SE O APP JÁ ESTIVER INSTALADO, ESCONDE OS BOTÕES
         if (window.matchMedia('(display-mode: standalone)').matches) {
             document.getElementById('install-area').style.display = 'none';
         }
