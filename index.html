@@ -111,11 +111,11 @@
         .btn-exit-yes { background: #ef4444; color: white; border: none; flex: 1; padding: 15px; border-radius: 15px; font-weight: 800; }
         .btn-exit-no { background: var(--glass); color: white; border: none; flex: 1; padding: 15px; border-radius: 15px; font-weight: 800; }
 
-        /* NOVA SEÇÃO: ESTILO DA TELA DE PRE-LOGIN */
+        /* ESTILO DA NOVA SPLASH SCREEN */
         #screen-pre-login {
             height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
             padding: 30px; text-align: center;
-            background: linear-gradient(rgba(7, 11, 20, 0.7), rgba(7, 11, 20, 0.7)), url('fundoentrada.png');
+            background: linear-gradient(rgba(7, 11, 20, 0.75), rgba(7, 11, 20, 0.75)), url('fundoentrada.png');
             background-size: cover; background-position: center;
         }
     </style>
@@ -147,16 +147,12 @@
         </div>
     </div>
 
-    <section id="screen-pre-login">
+    <section id="screen-pre-login" style="display: flex;">
         <h1 style="font-size:3.5rem; font-weight:900; background:var(--gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin:0;">BarcoApp</h1>
         <p style="color:#fff; margin-bottom:40px; font-weight: 600;">Sua escala oficial de embarcações.</p>
         
-        <div style="width:100%; max-width:350px; display: flex; flex-direction: column; gap: 15px;">
-            <button class="btn-main" onclick="goToUserLogin()">
-                <i class="fas fa-ship"></i> ACESSAR ESCALAS
-            </button>
-
-            <div style="margin-top: 20px; background: rgba(0,0,0,0.6); padding: 20px; border-radius: 25px; border: 1px solid var(--glass);">
+        <div style="width:100%; max-width:350px;">
+            <div style="background: rgba(0,0,0,0.6); padding: 20px; border-radius: 25px; border: 1px solid var(--glass);">
                 <p style="font-size: 0.7rem; color: #fff; font-weight: 800; margin-bottom: 15px;">INSTALAR NO CELULAR</p>
                 <div style="display: flex; flex-direction: column; gap: 10px;">
                     <button id="btn-install-android-pre" class="btn-main" style="display:none; background: #3ddc84; color: #000; font-size: 0.75rem;">
@@ -167,16 +163,17 @@
                     </button>
                 </div>
             </div>
+            <p style="font-size: 0.6rem; color: var(--text-dim); margin-top: 25px;">Carregando escalas...</p>
         </div>
     </section>
 
     <section id="screen-welcome" style="display:none; height:100vh; flex-direction:column; justify-content:center; align-items:center; padding:30px; text-align:center;">
-        <h2 style="color:var(--accent-cyan); font-weight:800; margin-bottom:20px;">Identificação</h2>
+        <h1 style="font-size:3.5rem; font-weight:900; background:var(--gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin:0;">BarcoApp</h1>
+        <p style="color:var(--text-dim); margin-bottom:40px;">Sua escala oficial de embarcações.</p>
         <div style="width:100%; max-width:350px;">
             <input type="text" id="user-name" class="input-premium" placeholder="Seu Nome" style="margin-bottom:12px;">
             <input type="tel" id="user-phone" class="input-premium" placeholder="WhatsApp com DDD" style="margin-bottom:25px;">
             <button class="btn-main" onclick="launchApp()">ENTRAR NO APP</button>
-            <button onclick="location.reload()" style="background:none; border:none; color:var(--text-dim); margin-top:20px; font-size:0.8rem;">Voltar</button>
         </div>
     </section>
 
@@ -316,7 +313,6 @@
         firebase.initializeApp(firebaseConfig);
         const rtdb = firebase.database();
 
-        // SEGURANÇA: LOGIN AUTOMÁTICO
         firebase.auth().onAuthStateChanged((user) => {
             if (!user) {
                 firebase.auth().signInAnonymously().catch(err => console.error("Erro Auth:", err.message));
@@ -329,12 +325,6 @@
         let showcaseSwiperInstance = null;
         let allBoatsLocal = [];
         const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
-
-        // NOVAS FUNÇÕES DE NAVEGAÇÃO INICIAL
-        function goToUserLogin() {
-            document.getElementById('screen-pre-login').style.display = 'none';
-            document.getElementById('screen-welcome').style.display = 'flex';
-        }
 
         function openCustomAlert(msg, title = "Sucesso!") {
             document.getElementById('alert-title').innerText = title;
@@ -467,14 +457,11 @@
                 document.getElementById('modal-time').innerText = "⏰ Hora: " + b.time;
                 document.getElementById('modal-price-p').innerText = "🎟 Passagem: R$ " + b.price_p;
                 document.getElementById('modal-price-c').innerText = "🛌 Camarote: R$ " + b.price_c;
-                
                 document.getElementById('btn-share-post').onclick = () => shareBoat(b);
-
                 document.getElementById('btn-like').onclick = () => registerVote(key, 'likes');
                 document.getElementById('btn-dislike').onclick = () => registerVote(key, 'dislikes');
                 document.getElementById('btn-wa1').onclick = () => window.open(`https://wa.me/55${b.tel1.replace(/\D/g,'')}?text=Vi seu barco no BarcoApp!`);
                 document.getElementById('btn-wa2').onclick = () => window.open(`https://wa.me/55${b.tel2.replace(/\D/g,'')}?text=Vi seu barco no BarcoApp!`);
-                
                 document.getElementById('boat-modal').style.display = 'flex';
             });
         }
@@ -526,31 +513,21 @@
         }
 
         function publish() {
-            const nameInput = document.getElementById('in-name');
-            const dateInput = document.getElementById('in-date');
-            if(!nameInput.value || !dateInput.value) return openCustomAlert("Preencha Nome e Data!", "Erro");
-
+            const nameI = document.getElementById('in-name');
+            const dateI = document.getElementById('in-date');
+            if(!nameI.value || !dateI.value) return openCustomAlert("Preencha Nome e Data!", "Erro");
             firebase.auth().signInAnonymously().then(() => {
                 const boat = {
-                    name: nameInput.value,
-                    departure: document.getElementById('in-departure').value,
-                    origin: document.getElementById('in-origin').value,
-                    destiny: document.getElementById('in-destiny').value,
-                    date: dateInput.value,
-                    time: document.getElementById('in-time').value,
-                    price_p: document.getElementById('in-price-p').value,
-                    price_c: document.getElementById('in-price-c').value,
-                    tel1: document.getElementById('in-tel-1').value,
-                    tel2: document.getElementById('in-tel-2').value,
-                    img: currentImg,
-                    likes: 0,
-                    dislikes: 0,
-                    registeredBy: currentUser ? currentUser.phone : "Sistema"
+                    name: nameI.value, departure: document.getElementById('in-departure').value,
+                    origin: document.getElementById('in-origin').value, destiny: document.getElementById('in-destiny').value,
+                    date: dateI.value, time: document.getElementById('in-time').value,
+                    price_p: document.getElementById('in-price-p').value, price_c: document.getElementById('in-price-c').value,
+                    tel1: document.getElementById('in-tel-1').value, tel2: document.getElementById('in-tel-2').value,
+                    img: currentImg, likes: 0, dislikes: 0, registeredBy: currentUser ? currentUser.phone : "Sistema"
                 };
-                const dName = diasSemana[new Date(dateInput.value.split('-')[0], dateInput.value.split('-')[1]-1, dateInput.value.split('-')[2]).getDay()];
-                rtdb.ref('barcos/' + dName).push(boat).then(() => { 
-                    openCustomAlert("Publicado com sucesso!"); 
-                    navigate('screen-main'); 
+                const dN = diasSemana[new Date(dateI.value.split('-')[0], dateI.value.split('-')[1]-1, dateI.value.split('-')[2]).getDay()];
+                rtdb.ref('barcos/' + dN).push(boat).then(() => { 
+                    openCustomAlert("Publicado com sucesso!"); navigate('screen-main'); 
                 });
             });
         }
@@ -621,14 +598,21 @@
                 "Como Instalar no iOS"
             );
         }
-        
-        // CONTROLE DE CARREGAMENTO (IMPORTANTE)
+
+        // CARREGAMENTO E TRANSIÇÃO AUTOMÁTICA
         window.onload = () => { 
             if(currentUser) {
                 document.getElementById('screen-pre-login').style.display = 'none';
                 startApp(); 
             } else {
                 document.getElementById('screen-pre-login').style.display = 'flex';
+                // Transição automática para o login após 3.5 segundos
+                setTimeout(() => {
+                    if (!currentUser && document.getElementById('screen-pre-login').style.display !== 'none') {
+                        document.getElementById('screen-pre-login').style.display = 'none';
+                        document.getElementById('screen-welcome').style.display = 'flex';
+                    }
+                }, 3500);
             }
         };
     </script>
