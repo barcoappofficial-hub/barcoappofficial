@@ -110,14 +110,6 @@
         .exit-btn-group { display: flex; gap: 10px; margin-top: 20px; }
         .btn-exit-yes { background: #ef4444; color: white; border: none; flex: 1; padding: 15px; border-radius: 15px; font-weight: 800; }
         .btn-exit-no { background: var(--glass); color: white; border: none; flex: 1; padding: 15px; border-radius: 15px; font-weight: 800; }
-
-        /* ESTILO DA SPLASH SCREEN (TELA INICIAL) */
-        #screen-pre-login {
-            height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 30px; text-align: center;
-            background: linear-gradient(rgba(7, 11, 20, 0.75), rgba(7, 11, 20, 0.75)), url('fundoentrada.png');
-            background-size: cover; background-position: center;
-        }
     </style>
 </head>
 <body>
@@ -146,26 +138,6 @@
             </div>
         </div>
     </div>
-
-    <section id="screen-pre-login" style="display: none;">
-        <h1 style="font-size:3.5rem; font-weight:900; background:var(--gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin:0;">BarcoApp</h1>
-        <p style="color:#fff; margin-bottom:40px; font-weight: 600;">Sua escala oficial de embarcações.</p>
-        
-        <div style="width:100%; max-width:350px;">
-            <div style="background: rgba(0,0,0,0.6); padding: 20px; border-radius: 25px; border: 1px solid var(--glass);">
-                <p style="font-size: 0.7rem; color: #fff; font-weight: 800; margin-bottom: 15px;">INSTALAR NO CELULAR</p>
-                <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <button id="btn-install-android-pre" class="btn-main" style="display:none; background: #3ddc84; color: #000; font-size: 0.75rem;">
-                        <i class="fab fa-android"></i> 1. INSTALAR ANDROID
-                    </button>
-                    <button onclick="showIosInstructions()" class="btn-main" style="background: #fff; color: #000; font-size: 0.75rem;">
-                        <i class="fab fa-apple"></i> 2. INSTALAR IPHONE (iOS)
-                    </button>
-                </div>
-            </div>
-            <p style="font-size: 0.6rem; color: var(--text-dim); margin-top: 25px;">Aguarde, carregando escalas...</p>
-        </div>
-    </section>
 
     <section id="screen-welcome" style="display:none; height:100vh; flex-direction:column; justify-content:center; align-items:center; padding:30px; text-align:center;">
         <h1 style="font-size:3.5rem; font-weight:900; background:var(--gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin:0;">BarcoApp</h1>
@@ -326,7 +298,7 @@
         let allBoatsLocal = [];
         const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
 
-        // Funções Originais
+        // Funções Originais Preservadas
         function openCustomAlert(msg, title = "Sucesso!") {
             document.getElementById('alert-title').innerText = title;
             document.getElementById('alert-msg').innerText = msg;
@@ -514,19 +486,19 @@
         }
 
         function publish() {
-            const nameInput = document.getElementById('in-name');
-            const dateInput = document.getElementById('in-date');
-            if(!nameInput.value || !dateInput.value) return openCustomAlert("Preencha Nome e Data!", "Erro");
+            const nameI = document.getElementById('in-name');
+            const dateI = document.getElementById('in-date');
+            if(!nameI.value || !dateI.value) return openCustomAlert("Preencha Nome e Data!", "Erro");
             firebase.auth().signInAnonymously().then(() => {
                 const boat = {
-                    name: nameInput.value, departure: document.getElementById('in-departure').value,
+                    name: nameI.value, departure: document.getElementById('in-departure').value,
                     origin: document.getElementById('in-origin').value, destiny: document.getElementById('in-destiny').value,
-                    date: dateInput.value, time: document.getElementById('in-time').value,
+                    date: dateI.value, time: document.getElementById('in-time').value,
                     price_p: document.getElementById('in-price-p').value, price_c: document.getElementById('in-price-c').value,
                     tel1: document.getElementById('in-tel-1').value, tel2: document.getElementById('in-tel-2').value,
                     img: currentImg, likes: 0, dislikes: 0, registeredBy: currentUser ? currentUser.phone : "Sistema"
                 };
-                const dN = diasSemana[new Date(dateInput.value.split('-')[0], dateInput.value.split('-')[1]-1, dateInput.value.split('-')[2]).getDay()];
+                const dN = diasSemana[new Date(dateI.value.split('-')[0], dateI.value.split('-')[1]-1, dateI.value.split('-')[2]).getDay()];
                 rtdb.ref('barcos/' + dN).push(boat).then(() => { 
                     openCustomAlert("Publicado com sucesso!"); navigate('screen-main'); 
                 });
@@ -575,47 +547,12 @@
 
         function shareApp() { window.open("https://wa.me/?text=🚢 BarcoApp: " + window.location.href); }
 
-        // LÓGICA DE INSTALAÇÃO (PWA)
-        let installPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            installPrompt = e;
-            const btnAndroid = document.getElementById('btn-install-android-pre');
-            if(btnAndroid) btnAndroid.style.display = 'flex';
-        });
-
-        document.getElementById('btn-install-android-pre')?.addEventListener('click', async () => {
-            if (installPrompt) {
-                installPrompt.prompt();
-                const { outcome } = await installPrompt.userChoice;
-                if (outcome === 'accepted') document.getElementById('btn-install-android-pre').style.display = 'none';
-                installPrompt = null;
-            }
-        });
-
-        function showIosInstructions() {
-            openCustomAlert(
-                "No seu iPhone:\n\n1. Toque no ícone de compartilhar (quadrado com seta abaixo).\n2. Role a lista e escolha 'Adicionar à Tela de Início'.", 
-                "Como Instalar no iOS"
-            );
-        }
-
-        // CARREGAMENTO E TRANSIÇÃO AUTOMÁTICA (MUITO CUIDADO AQUI)
+        // CARREGAMENTO DIRETO (SEM ESPERAS DE 3 MINUTOS)
         window.onload = () => { 
             if(currentUser) {
-                document.getElementById('screen-pre-login').style.display = 'none';
                 startApp(); 
             } else {
-                document.getElementById('screen-pre-login').style.display = 'flex';
-                
-                // Transição automática para o login após 3 MINUTOS (180.000 ms)
-                setTimeout(() => {
-                    const preLogin = document.getElementById('screen-pre-login');
-                    if (!currentUser && preLogin.style.display !== 'none') {
-                        preLogin.style.display = 'none';
-                        document.getElementById('screen-welcome').style.display = 'flex';
-                    }
-                }, 180000); 
+                navigate('screen-welcome');
             }
         };
     </script>
