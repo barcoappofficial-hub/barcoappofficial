@@ -1,15 +1,23 @@
 const CACHE_NAME = 'barco-app-v1';
 
-// Mantendo sua instalação exatamente como você gosta
+// MANTENDO TUDO EXATAMENTE COMO VOCÊ GOSTA
+// Apenas adicionamos o './app.html' na lista para o Android reconhecer o App completo
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(['./', './index.html', './logo.png', './manifest.json']);
+      return cache.addAll([
+        './', 
+        './index.html', 
+        './app.html', 
+        './logo.png', 
+        './manifest.json',
+        './sw.js'
+      ]);
     })
   );
 });
 
-// Mantendo sua estratégia de busca (Cache primeiro, depois rede)
+// Mantendo sua estratégia de busca (Cache primeiro, depois rede) - SEM ALTERAÇÕES NAS FUNÇÕES
 self.addEventListener('fetch', (e) => {
   e.respondWith(
     caches.match(e.request).then((response) => {
@@ -18,16 +26,16 @@ self.addEventListener('fetch', (e) => {
   );
 });
 
-// --- ADIÇÕES DE SEGURANÇA PARA O PWABUILDER ---
+// --- ADIÇÕES DE SEGURANÇA PARA O PWABUILDER (MANTIDAS INTEGRALMENTE) ---
 
-// 1. Sincronização em Segundo Plano (Background Sync)
+// 1. Sincronização em Segundo Plano
 self.addEventListener('sync', (event) => {
   if (event.tag === 'sync-barcos' || event.tag === 'sync-updates') {
     console.log('BarcoApp: Sincronizando dados...');
   }
 });
 
-// 2. Notificações Push (Reengajamento de usuários)
+// 2. Notificações Push
 self.addEventListener('push', (event) => {
   const options = {
     body: event.data ? event.data.text() : 'Nova atualização no BarcoApp',
@@ -41,7 +49,7 @@ self.addEventListener('push', (event) => {
   );
 });
 
-// 3. Sincronização Periódica (Periodic Sync)
+// 3. Sincronização Periódica
 self.addEventListener('periodicsync', (event) => {
   if (event.tag === 'update-cache' || event.tag === 'get-latest-escada') {
     console.log('BarcoApp: Atualizando escala em segundo plano');
@@ -54,4 +62,3 @@ self.addEventListener('message', (event) => {
     event.source.postMessage({ notes: [] });
   }
 });
-
