@@ -10,6 +10,7 @@
     
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
 
     <style>
         :root {
@@ -35,7 +36,18 @@
             min-height: 100vh;
         }
 
-        /* Sidebar Estilizada */
+        /* TELA DE LOGIN */
+        #login-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-dark); z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .login-card {
+            background: var(--bg-card); padding: 40px; border-radius: 30px;
+            border: 1px solid var(--border); width: 100%; max-width: 350px; text-align: center;
+        }
+
+        /* Sidebar */
         .sidebar { 
             width: var(--sidebar-width); 
             background: #010409; 
@@ -43,7 +55,7 @@
             position: fixed; 
             border-right: 1px solid var(--border); 
             padding: 30px 20px;
-            display: flex;
+            display: none; /* Inicia escondida */
             flex-direction: column;
         }
 
@@ -65,9 +77,8 @@
 
         .nav-item:hover, .nav-item.active { background: rgba(34, 211, 238, 0.08); color: var(--primary); }
 
-        .main { margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); padding: 40px; }
+        .main { margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); padding: 40px; display: none; }
 
-        /* Stats Cards */
         .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 40px; }
         .stat-card { background: var(--bg-card); padding: 24px; border-radius: 20px; border: 1px solid var(--border); position: relative; }
         .stat-card small { color: var(--text-dim); text-transform: uppercase; font-size: 0.7rem; font-weight: 800; }
@@ -100,7 +111,17 @@
 </head>
 <body>
 
-    <div class="sidebar">
+    <div id="login-overlay">
+        <div class="login-card">
+            <i class="fas fa-ship" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;"></i>
+            <h2 style="margin-bottom: 25px;">Acesso Restrito</h2>
+            <input type="text" id="admin-user" placeholder="Usuário">
+            <input type="password" id="admin-pass" placeholder="Senha">
+            <button class="btn btn-add" onclick="handleLogin()">Entrar no Painel</button>
+        </div>
+    </div>
+
+    <div class="sidebar" id="sidebar">
         <h1><i class="fas fa-ship"></i> BARCOAPP</h1>
         <a href="#" class="nav-item active"><i class="fas fa-th-large"></i> Dashboard</a>
         <a href="#boats-section" class="nav-item"><i class="fas fa-anchor"></i> Escalas</a>
@@ -108,7 +129,7 @@
         <a href="#carousel-section" class="nav-item"><i class="fas fa-image"></i> Carrossel</a>
     </div>
 
-    <div class="main">
+    <div class="main" id="main-content">
         <div class="stats-row">
             <div class="stat-card"><small>Total Usuários</small><h2 id="total-users">0</h2></div>
             <div class="stat-card"><small>Barcos Ativos</small><h2 id="total-boats">0</h2></div>
@@ -171,7 +192,6 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO FIREBASE BARCOAPP01 (Sincronizado com o App)
         const firebaseConfig = {
             apiKey: "AIzaSyCSqpD1irHfgXpzAytoRn_VNwImNzuGouE",
             authDomain: "barcoapp01.firebaseapp.com",
@@ -184,12 +204,31 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // Lógica de Login
+        function handleLogin() {
+            const u = document.getElementById('admin-user').value;
+            const p = document.getElementById('admin-pass').value;
+
+            // Altere aqui seu usuário e senha
+            if(u === "admin" && p === "barco77") {
+                document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('sidebar').style.display = 'flex';
+                document.getElementById('main-content').style.display = 'block';
+                
+                // IMPORTANTE: Logar no Firebase para permitir escrita
+                firebase.auth().signInAnonymously().then(() => {
+                    startApp();
+                });
+            } else {
+                alert("Acesso negado!");
+            }
+        }
+
         function startApp() {
             db.ref().on('value', snapshot => {
                 const data = snapshot.val();
                 if(!data) return;
                 
-                // Preencher Alerta se estiver ativo
                 if(data.config && data.config.alerta && data.config.alerta.active) {
                     document.getElementById('alert-msg').value = data.config.alerta.text;
                 }
@@ -202,7 +241,6 @@
             });
         }
 
-        // Lógica de Cálculo de Pontos
         function calculateUserStats(barcos, usuarios) {
             let stats = {};
             for(let id in usuarios) { stats[id] = { nome: usuarios[id].nome, saldo: 0 }; }
@@ -220,7 +258,6 @@
             return stats;
         }
 
-        // Renderização de Tabelas
         function renderUsers(users, stats) {
             const list = document.getElementById('users-list');
             list.innerHTML = ""; let count = 0;
@@ -280,7 +317,6 @@
             });
         }
 
-        // Funções de Escrita no Banco
         function saveCarousel() {
             const img = document.getElementById('car-img').value;
             const link = document.getElementById('car-link').value;
@@ -288,21 +324,22 @@
             db.ref('config/carrossel').push({ img, link }).then(() => {
                 document.getElementById('car-img').value = "";
                 document.getElementById('car-link').value = "";
-            });
+                alert("Banner adicionado!");
+            }).catch(e => alert("Erro: " + e.message));
         }
 
         function deleteSlide(key) { if(confirm("Remover este banner?")) db.ref(`config/carrossel/${key}`).remove(); }
 
         function pushAlert() {
             const text = document.getElementById('alert-msg').value;
-            if(!text) return alert("Digite o texto do alerta!");
-            db.ref('config/alerta').set({ text, active: true }).then(() => alert("Alerta ativado no App!"));
+            if(!text) return alert("Digite o texto!");
+            db.ref('config/alerta').set({ text, active: true }).then(() => alert("Alerta ativado!"));
         }
 
         function removeAlert() {
             db.ref('config/alerta').set({ text: "", active: false }).then(() => {
                 document.getElementById('alert-msg').value = "";
-                alert("Alerta desativado!");
+                alert("Alerta removido!");
             });
         }
 
@@ -317,10 +354,9 @@
                 </div>`).join('');
         }
 
-        function deleteUser(uid) { if(confirm("Deseja banir este usuário? Todas as postagens dele continuarão, mas ele perderá o acesso.")) db.ref(`usuarios_cadastrados/${uid}`).remove(); }
-        function deleteBoat(dia, key) { if(confirm("Excluir esta escala permanentemente?")) db.ref(`barcos/${dia}/${key}`).remove(); }
+        function deleteUser(uid) { if(confirm("Banir usuário?")) db.ref(`usuarios_cadastrados/${uid}`).remove(); }
+        function deleteBoat(dia, key) { if(confirm("Excluir escala?")) db.ref(`barcos/${dia}/${key}`).remove(); }
 
-        startApp();
     </script>
 </body>
 </html>
