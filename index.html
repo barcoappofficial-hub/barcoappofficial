@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Instalar BarcoApp</title>
+    
     <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
@@ -42,7 +45,7 @@
             <i class="fab fa-android"></i> 1. INSTALAR ANDROID
         </button>
         
-        <button onclick="alert('No iPhone: Toque no ícone de Compartilhar e Adicionar à Tela de Início')" class="btn-main" style="background: #fff; color: #000;">
+        <button onclick="alert('No iPhone: Toque no ícone de Compartilhar (seta para cima) e escolha Adicionar à Tela de Início')" class="btn-main" style="background: #fff; color: #000;">
             <i class="fab fa-apple"></i> 2. INSTALAR IPHONE
         </button>
     </div>
@@ -52,30 +55,37 @@
     </a>
 
     <script>
-        // REGISTRO DO SERVICE WORKER (OBRIGATÓRIO PARA ANDROID)
+        // 2. REGISTRO DO SERVICE WORKER (ESSENCIAL PARA O BOTÃO APARECER)
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-            .then(() => console.log("Service Worker Registrado!"));
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Service Worker pronto!', reg))
+                .catch(err => console.error('Erro no Service Worker', err));
+            });
         }
 
+        // 3. LÓGICA DO PROMPT DE INSTALAÇÃO
         let deferredPrompt;
+        const btnAndroid = document.getElementById('btnInstall');
+
         window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('O Chrome liberou a instalação!');
             e.preventDefault();
             deferredPrompt = e;
-            const btn = document.getElementById('btnInstall');
-            btn.style.display = 'flex'; 
+            // O botão só aparece quando o Chrome dá o sinal verde
+            btnAndroid.style.display = 'flex'; 
         });
 
-        document.getElementById('btnInstall').addEventListener('click', async () => {
+        btnAndroid.addEventListener('click', async () => {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') {
-                    window.location.href = "app.html";
+                    deferredPrompt = null;
+                    btnAndroid.style.display = 'none';
                 }
-                deferredPrompt = null;
             } else {
-                alert("Clique nos três pontinhos do navegador e escolha 'Instalar aplicativo'.");
+                alert("Para instalar agora: Clique nos 3 pontinhos do Chrome (topo direito) e escolha 'Instalar aplicativo'.");
             }
         });
     </script>
