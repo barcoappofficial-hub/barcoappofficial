@@ -111,18 +111,12 @@
         .btn-exit-yes { background: #ef4444; color: white; border: none; flex: 1; padding: 15px; border-radius: 15px; font-weight: 800; }
         .btn-exit-no { background: var(--glass); color: white; border: none; flex: 1; padding: 15px; border-radius: 15px; font-weight: 800; }
 
-        /* NOVO ESTILO: TELA DE ENTRADA COM FUNDO */
-        #screen-welcome {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 30px;
-            text-align: center;
-            background: linear-gradient(rgba(7, 11, 20, 0.8), rgba(7, 11, 20, 0.8)), url('fundoentrada.png');
-            background-size: cover;
-            background-position: center;
+        /* NOVA SEÇÃO: ESTILO DA TELA DE PRE-LOGIN */
+        #screen-pre-login {
+            height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 30px; text-align: center;
+            background: linear-gradient(rgba(7, 11, 20, 0.7), rgba(7, 11, 20, 0.7)), url('fundoentrada.png');
+            background-size: cover; background-position: center;
         }
     </style>
 </head>
@@ -153,23 +147,36 @@
         </div>
     </div>
 
-    <section id="screen-welcome">
+    <section id="screen-pre-login">
         <h1 style="font-size:3.5rem; font-weight:900; background:var(--gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin:0;">BarcoApp</h1>
-        <p style="color:var(--text-dim); margin-bottom:40px;">Sua escala oficial de embarcações.</p>
+        <p style="color:#fff; margin-bottom:40px; font-weight: 600;">Sua escala oficial de embarcações.</p>
+        
+        <div style="width:100%; max-width:350px; display: flex; flex-direction: column; gap: 15px;">
+            <button class="btn-main" onclick="goToUserLogin()">
+                <i class="fas fa-ship"></i> ACESSAR ESCALAS
+            </button>
+
+            <div style="margin-top: 20px; background: rgba(0,0,0,0.6); padding: 20px; border-radius: 25px; border: 1px solid var(--glass);">
+                <p style="font-size: 0.7rem; color: #fff; font-weight: 800; margin-bottom: 15px;">INSTALAR NO CELULAR</p>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <button id="btn-install-android-pre" class="btn-main" style="display:none; background: #3ddc84; color: #000; font-size: 0.75rem;">
+                        <i class="fab fa-android"></i> 1. INSTALAR ANDROID
+                    </button>
+                    <button onclick="showIosInstructions()" class="btn-main" style="background: #fff; color: #000; font-size: 0.75rem;">
+                        <i class="fab fa-apple"></i> 2. INSTALAR IPHONE (iOS)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="screen-welcome" style="display:none; height:100vh; flex-direction:column; justify-content:center; align-items:center; padding:30px; text-align:center;">
+        <h2 style="color:var(--accent-cyan); font-weight:800; margin-bottom:20px;">Identificação</h2>
         <div style="width:100%; max-width:350px;">
             <input type="text" id="user-name" class="input-premium" placeholder="Seu Nome" style="margin-bottom:12px;">
             <input type="tel" id="user-phone" class="input-premium" placeholder="WhatsApp com DDD" style="margin-bottom:25px;">
             <button class="btn-main" onclick="launchApp()">ENTRAR NO APP</button>
-
-            <div style="margin-top: 30px; display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 20px; border: 1px solid var(--glass);">
-                <p style="font-size: 0.65rem; color: #fff; font-weight: 800;">QUER INSTALAR O APP NO CELULAR?</p>
-                <button id="btn-install-android" class="btn-main" style="display:none; background: #3ddc84; color: #000; font-size: 0.75rem; padding: 12px;">
-                    <i class="fab fa-android"></i> 1. INSTALAR ANDROID
-                </button>
-                <button onclick="showIosInstructions()" class="btn-main" style="background: #fff; color: #000; font-size: 0.75rem; padding: 12px;">
-                    <i class="fab fa-apple"></i> 2. INSTALAR IPHONE (iOS)
-                </button>
-            </div>
+            <button onclick="location.reload()" style="background:none; border:none; color:var(--text-dim); margin-top:20px; font-size:0.8rem;">Voltar</button>
         </div>
     </section>
 
@@ -323,7 +330,12 @@
         let allBoatsLocal = [];
         const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
 
-        // Funções de Interface
+        // NOVAS FUNÇÕES DE NAVEGAÇÃO INICIAL
+        function goToUserLogin() {
+            document.getElementById('screen-pre-login').style.display = 'none';
+            document.getElementById('screen-welcome').style.display = 'flex';
+        }
+
         function openCustomAlert(msg, title = "Sucesso!") {
             document.getElementById('alert-title').innerText = title;
             document.getElementById('alert-msg').innerText = msg;
@@ -585,20 +597,20 @@
 
         function shareApp() { window.open("https://wa.me/?text=🚢 BarcoApp: " + window.location.href); }
 
-        // --- LÓGICA DE INSTALAÇÃO (PWA) ---
+        // LÓGICA DE INSTALAÇÃO (PWA)
         let installPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             installPrompt = e;
-            const btnAndroid = document.getElementById('btn-install-android');
+            const btnAndroid = document.getElementById('btn-install-android-pre');
             if(btnAndroid) btnAndroid.style.display = 'flex';
         });
 
-        document.getElementById('btn-install-android')?.addEventListener('click', async () => {
+        document.getElementById('btn-install-android-pre')?.addEventListener('click', async () => {
             if (installPrompt) {
                 installPrompt.prompt();
                 const { outcome } = await installPrompt.userChoice;
-                if (outcome === 'accepted') document.getElementById('btn-install-android').style.display = 'none';
+                if (outcome === 'accepted') document.getElementById('btn-install-android-pre').style.display = 'none';
                 installPrompt = null;
             }
         });
@@ -610,7 +622,15 @@
             );
         }
         
-        window.onload = () => { if(currentUser) startApp(); };
+        // CONTROLE DE CARREGAMENTO (IMPORTANTE)
+        window.onload = () => { 
+            if(currentUser) {
+                document.getElementById('screen-pre-login').style.display = 'none';
+                startApp(); 
+            } else {
+                document.getElementById('screen-pre-login').style.display = 'flex';
+            }
+        };
     </script>
 </body>
 </html>
