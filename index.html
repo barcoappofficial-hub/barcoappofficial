@@ -20,10 +20,10 @@
             color: white;
         }
 
-        /* ESTILO DA LOGO - VIA CSS PARA NÃO TRAVAR O BOTÃO */
-        .minha-logo {
+        /* USANDO A NOVA IMAGEM icone.png */
+        .app-icon {
             width: 100px; height: 100px;
-            background-image: url('logo.png');
+            background-image: url('icone.png');
             background-size: cover;
             background-position: center;
             border-radius: 25px;
@@ -41,7 +41,7 @@
     </style>
 </head>
 <body>
-    <div class="minha-logo"></div>
+    <div class="app-icon"></div>
 
     <h1 style="font-size:3rem; margin:0;">BarcoApp</h1>
     <p>Instale agora para ver as escalas oficiais.</p>
@@ -63,17 +63,16 @@
     </a>
 
     <script>
-        // Registro do Service Worker é fundamental para o botão Android aparecer
+        // Registro do Service Worker (Essencial para o Android liberar o botão)
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js');
         }
 
-        // Lógica que você confirmou que funciona
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
-            console.log('Android PWA Detectado!');
             e.preventDefault();
             deferredPrompt = e;
+            // Só mostra o botão quando o Android confirmar que o PWA está ok
             document.getElementById('btnInstall').style.display = 'flex';
         });
 
