@@ -285,7 +285,7 @@
         firebase.initializeApp(firebaseConfig);
         const rtdb = firebase.database();
 
-        // --- ADIÇÃO DE SEGURANÇA: LOGIN AUTOMÁTICO PARA LIBERAR POSTAGEM ---
+        // SEGURANÇA: LOGIN AUTOMÁTICO
         firebase.auth().onAuthStateChanged((user) => {
             if (!user) {
                 firebase.auth().signInAnonymously().catch(err => console.error("Erro Auth:", err.message));
@@ -299,7 +299,6 @@
         let allBoatsLocal = [];
         const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
 
-        // Funções de Interface
         function openCustomAlert(msg, title = "Sucesso!") {
             document.getElementById('alert-title').innerText = title;
             document.getElementById('alert-msg').innerText = msg;
@@ -315,7 +314,6 @@
             window.scrollTo(0,0);
         }
 
-        // Login e Inicialização
         function launchApp() {
             const n = document.getElementById('user-name').value.trim();
             const p = document.getElementById('user-phone').value.replace(/\D/g,'');
@@ -337,7 +335,6 @@
             updateStats();
         }
 
-        // Listagem e Filtros
         function listenDynamicShowcase() {
             rtdb.ref('barcos').on('value', snapshot => {
                 const wrapper = document.getElementById('dynamic-showcase-wrapper');
@@ -422,7 +419,6 @@
             });
         }
 
-        // Ações (Votos e Detalhes)
         function openDetails(key) {
             rtdb.ref(`barcos/${currentDayPage}/${key}`).once('value', s => {
                 const b = s.val();
@@ -435,14 +431,32 @@
                 document.getElementById('modal-price-p').innerText = "🎟 Passagem: R$ " + b.price_p;
                 document.getElementById('modal-price-c').innerText = "🛌 Camarote: R$ " + b.price_c;
                 
+                // FUNÇÃO DE COMPARTILHAR - ATUALIZADA
+                document.getElementById('btn-share-post').onclick = () => shareBoat(b);
+
                 document.getElementById('btn-like').onclick = () => registerVote(key, 'likes');
                 document.getElementById('btn-dislike').onclick = () => registerVote(key, 'dislikes');
-                document.getElementById('btn-share-post').onclick = () => shareBoat(b);
                 document.getElementById('btn-wa1').onclick = () => window.open(`https://wa.me/55${b.tel1.replace(/\D/g,'')}?text=Vi seu barco no BarcoApp!`);
                 document.getElementById('btn-wa2').onclick = () => window.open(`https://wa.me/55${b.tel2.replace(/\D/g,'')}?text=Vi seu barco no BarcoApp!`);
                 
                 document.getElementById('boat-modal').style.display = 'flex';
             });
+        }
+
+        // LÓGICA DE COMPARTILHAMENTO PROFISSIONAL
+        function shareBoat(b) {
+            const dataF = formatDateBR(b.date);
+            const texto = window.encodeURIComponent(
+                `🚢 *BARCOAPP - INFORMAÇÃO DE VIAGEM*\n\n` +
+                `*Embarcação:* ${b.name}\n` +
+                `*Rota:* ${b.origin} ➔ ${b.destiny}\n` +
+                `*Saída:* ${b.departure || 'Porto Principal'}\n` +
+                `*Data:* ${dataF} às ${b.time}\n\n` +
+                `💰 *Passagem:* R$ ${b.price_p}\n` +
+                `🛌 *Camarote:* R$ ${b.price_c}\n\n` +
+                `📲 Veja mais no BarcoApp!`
+            );
+            window.open(`https://wa.me/?text=${texto}`, '_blank');
         }
 
         function registerVote(boatKey, type) {
@@ -456,7 +470,6 @@
             });
         }
 
-        // Publicação
         function processImage(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
@@ -478,19 +491,17 @@
         }
 
         function publish() {
-            const nameInput = document.getElementById('in-name');
-            const dateInput = document.getElementById('in-date');
-            
-            if(!nameInput.value || !dateInput.value) return openCustomAlert("Preencha Nome e Data!", "Erro");
+            const nameI = document.getElementById('in-name');
+            const dateI = document.getElementById('in-date');
+            if(!nameI.value || !dateI.value) return openCustomAlert("Preencha Nome e Data!", "Erro");
 
-            // Garante Auth antes da postagem
             firebase.auth().signInAnonymously().then(() => {
                 const boat = {
-                    name: nameInput.value,
+                    name: nameI.value,
                     departure: document.getElementById('in-departure').value,
                     origin: document.getElementById('in-origin').value,
                     destiny: document.getElementById('in-destiny').value,
-                    date: dateInput.value,
+                    date: dateI.value,
                     time: document.getElementById('in-time').value,
                     price_p: document.getElementById('in-price-p').value,
                     price_c: document.getElementById('in-price-c').value,
@@ -501,15 +512,10 @@
                     dislikes: 0,
                     registeredBy: currentUser ? currentUser.phone : "Sistema"
                 };
-                
-                const dName = diasSemana[new Date(dateInput.value.split('-')[0], dateInput.value.split('-')[1]-1, dateInput.value.split('-')[2]).getDay()];
-                
-                rtdb.ref('barcos/' + dName).push(boat).then(() => { 
+                const dN = diasSemana[new Date(dateI.value.split('-')[0], dateI.value.split('-')[1]-1, dateI.value.split('-')[2]).getDay()];
+                rtdb.ref('barcos/' + dN).push(boat).then(() => { 
                     openCustomAlert("Publicado com sucesso!"); 
                     navigate('screen-main'); 
-                }).catch(err => {
-                    console.error("Erro na publicação:", err);
-                    alert("Erro de permissão. Tente novamente em instantes.");
                 });
             });
         }
