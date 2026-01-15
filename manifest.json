@@ -7,7 +7,7 @@
   "dir": "ltr",
   "categories": ["business", "productivity", "utilities"],
   "iarc_rating_id": "e542866b-e3a1-424a-9e19-58d082269a8b",
-  "start_url": "index.html",
+  "start_url": "app.html",
   "scope": "/",
   "display": "standalone",
   "display_override": ["tabbed", "window-controls-overlay", "standalone", "minimal-ui"],
@@ -30,7 +30,7 @@
     "client_mode": "focus-existing"
   },
   "share_target": {
-    "action": "/index.html",
+    "action": "/app.html",
     "method": "GET",
     "params": {
       "title": "title",
@@ -41,7 +41,7 @@
   "shortcuts": [
     {
       "name": "Ver Escala",
-      "url": "index.html",
+      "url": "app.html",
       "description": "Abre a lista de embarcações"
     },
     {
