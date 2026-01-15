@@ -110,6 +110,20 @@
         .exit-btn-group { display: flex; gap: 10px; margin-top: 20px; }
         .btn-exit-yes { background: #ef4444; color: white; border: none; flex: 1; padding: 15px; border-radius: 15px; font-weight: 800; }
         .btn-exit-no { background: var(--glass); color: white; border: none; flex: 1; padding: 15px; border-radius: 15px; font-weight: 800; }
+
+        /* NOVO ESTILO: TELA DE ENTRADA COM FUNDO */
+        #screen-welcome {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            text-align: center;
+            background: linear-gradient(rgba(7, 11, 20, 0.8), rgba(7, 11, 20, 0.8)), url('fundoentrada.png');
+            background-size: cover;
+            background-position: center;
+        }
     </style>
 </head>
 <body>
@@ -139,13 +153,23 @@
         </div>
     </div>
 
-    <section id="screen-welcome" style="height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:30px; text-align:center;">
+    <section id="screen-welcome">
         <h1 style="font-size:3.5rem; font-weight:900; background:var(--gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin:0;">BarcoApp</h1>
         <p style="color:var(--text-dim); margin-bottom:40px;">Sua escala oficial de embarcações.</p>
         <div style="width:100%; max-width:350px;">
             <input type="text" id="user-name" class="input-premium" placeholder="Seu Nome" style="margin-bottom:12px;">
             <input type="tel" id="user-phone" class="input-premium" placeholder="WhatsApp com DDD" style="margin-bottom:25px;">
             <button class="btn-main" onclick="launchApp()">ENTRAR NO APP</button>
+
+            <div style="margin-top: 30px; display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 20px; border: 1px solid var(--glass);">
+                <p style="font-size: 0.65rem; color: #fff; font-weight: 800;">QUER INSTALAR O APP NO CELULAR?</p>
+                <button id="btn-install-android" class="btn-main" style="display:none; background: #3ddc84; color: #000; font-size: 0.75rem; padding: 12px;">
+                    <i class="fab fa-android"></i> 1. INSTALAR ANDROID
+                </button>
+                <button onclick="showIosInstructions()" class="btn-main" style="background: #fff; color: #000; font-size: 0.75rem; padding: 12px;">
+                    <i class="fab fa-apple"></i> 2. INSTALAR IPHONE (iOS)
+                </button>
+            </div>
         </div>
     </section>
 
@@ -299,6 +323,7 @@
         let allBoatsLocal = [];
         const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
 
+        // Funções de Interface
         function openCustomAlert(msg, title = "Sucesso!") {
             document.getElementById('alert-title').innerText = title;
             document.getElementById('alert-msg').innerText = msg;
@@ -431,7 +456,6 @@
                 document.getElementById('modal-price-p').innerText = "🎟 Passagem: R$ " + b.price_p;
                 document.getElementById('modal-price-c').innerText = "🛌 Camarote: R$ " + b.price_c;
                 
-                // FUNÇÃO DE COMPARTILHAR - ATUALIZADA
                 document.getElementById('btn-share-post').onclick = () => shareBoat(b);
 
                 document.getElementById('btn-like').onclick = () => registerVote(key, 'likes');
@@ -443,7 +467,6 @@
             });
         }
 
-        // LÓGICA DE COMPARTILHAMENTO PROFISSIONAL
         function shareBoat(b) {
             const dataF = formatDateBR(b.date);
             const texto = window.encodeURIComponent(
@@ -491,17 +514,17 @@
         }
 
         function publish() {
-            const nameI = document.getElementById('in-name');
-            const dateI = document.getElementById('in-date');
-            if(!nameI.value || !dateI.value) return openCustomAlert("Preencha Nome e Data!", "Erro");
+            const nameInput = document.getElementById('in-name');
+            const dateInput = document.getElementById('in-date');
+            if(!nameInput.value || !dateInput.value) return openCustomAlert("Preencha Nome e Data!", "Erro");
 
             firebase.auth().signInAnonymously().then(() => {
                 const boat = {
-                    name: nameI.value,
+                    name: nameInput.value,
                     departure: document.getElementById('in-departure').value,
                     origin: document.getElementById('in-origin').value,
                     destiny: document.getElementById('in-destiny').value,
-                    date: dateI.value,
+                    date: dateInput.value,
                     time: document.getElementById('in-time').value,
                     price_p: document.getElementById('in-price-p').value,
                     price_c: document.getElementById('in-price-c').value,
@@ -512,8 +535,8 @@
                     dislikes: 0,
                     registeredBy: currentUser ? currentUser.phone : "Sistema"
                 };
-                const dN = diasSemana[new Date(dateI.value.split('-')[0], dateI.value.split('-')[1]-1, dateI.value.split('-')[2]).getDay()];
-                rtdb.ref('barcos/' + dN).push(boat).then(() => { 
+                const dName = diasSemana[new Date(dateInput.value.split('-')[0], dateInput.value.split('-')[1]-1, dateInput.value.split('-')[2]).getDay()];
+                rtdb.ref('barcos/' + dName).push(boat).then(() => { 
                     openCustomAlert("Publicado com sucesso!"); 
                     navigate('screen-main'); 
                 });
@@ -561,6 +584,31 @@
         }
 
         function shareApp() { window.open("https://wa.me/?text=🚢 BarcoApp: " + window.location.href); }
+
+        // --- LÓGICA DE INSTALAÇÃO (PWA) ---
+        let installPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            installPrompt = e;
+            const btnAndroid = document.getElementById('btn-install-android');
+            if(btnAndroid) btnAndroid.style.display = 'flex';
+        });
+
+        document.getElementById('btn-install-android')?.addEventListener('click', async () => {
+            if (installPrompt) {
+                installPrompt.prompt();
+                const { outcome } = await installPrompt.userChoice;
+                if (outcome === 'accepted') document.getElementById('btn-install-android').style.display = 'none';
+                installPrompt = null;
+            }
+        });
+
+        function showIosInstructions() {
+            openCustomAlert(
+                "No seu iPhone:\n\n1. Toque no ícone de compartilhar (quadrado com seta abaixo).\n2. Role a lista e escolha 'Adicionar à Tela de Início'.", 
+                "Como Instalar no iOS"
+            );
+        }
         
         window.onload = () => { if(currentUser) startApp(); };
     </script>
