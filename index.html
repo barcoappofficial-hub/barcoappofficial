@@ -4,10 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Instalar BarcoApp</title>
-    
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0f172a">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
@@ -19,68 +15,44 @@
             background-size: cover; background-position: center;
             color: white;
         }
-        /* ESTILO DA LOGO */
-        .logo-main {
-            width: 100px; height: 100px;
-            border-radius: 25px;
-            margin-bottom: 10px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-            border: 2px solid rgba(255,255,255,0.1);
-        }
         .btn-main {
             width: 280px; padding: 16px; border-radius: 14px; border: none;
             background: linear-gradient(135deg, #22d3ee 0%, #a855f7 100%);
             color: white; font-weight: 800; cursor: pointer; margin: 10px 0;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
         }
     </style>
 </head>
 <body>
-    <img src="logo.png" alt="Logo" class="logo-main">
-
     <h1 style="font-size:3rem; margin:0;">BarcoApp</h1>
     <p>Instale agora para ver as escalas oficiais.</p>
 
     <div style="background: rgba(0,0,0,0.6); padding: 25px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1);">
         <p style="font-size: 0.8rem; font-weight: 800; margin-bottom: 15px;">ESCOLHA SEU CELULAR</p>
-        
-        <button id="btnInstall" class="btn-main" style="background: #3ddc84; color: #000; display: none;">
+        <button id="btnInstall" class="btn-main" style="background: #3ddc84; color: #000;">
             <i class="fab fa-android"></i> INSTALAR ANDROID
         </button>
-        
         <button onclick="alert('No iPhone: Toque em Compartilhar e Adicionar à Tela de Início')" class="btn-main" style="background: #fff; color: #000;">
             <i class="fab fa-apple"></i> INSTALAR IPHONE
         </button>
     </div>
 
-    <a href="app.html" style="color: #94a3b8; margin-top: 30px; text-decoration: none; font-size: 0.9rem;">
+    <a href="index.html" style="color: #94a3b8; margin-top: 30px; text-decoration: none; font-size: 0.9rem;">
         Já tenho o App ou quero entrar agora →
     </a>
 
     <script>
-        // REGISTRO DO SERVICE WORKER (Para o Android liberar o botão)
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
-        }
-
+        // Lógica para o botão de instalar funcionar aqui também
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
-            console.log('Chrome detectou o App! Liberando botão...');
             e.preventDefault();
             deferredPrompt = e;
-            // Mostra o botão quando o Chrome autorizar
-            document.getElementById('btnInstall').style.display = 'flex';
+            document.getElementById('btnInstall').style.display = 'block';
         });
 
         document.getElementById('btnInstall').addEventListener('click', async () => {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    deferredPrompt = null;
-                }
-            } else {
-                alert("Abra o menu do Chrome (3 pontinhos) e clique em 'Instalar Aplicativo'.");
+                deferredPrompt = null;
             }
         });
     </script>
