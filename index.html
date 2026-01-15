@@ -272,7 +272,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
     <script>
-        // CONFIGURAÇÃO FIREBASE BARCOAPP01 - ATUALIZADA
+        // CONFIGURAÇÃO FIREBASE BARCOAPP01
         const firebaseConfig = {
             apiKey: "AIzaSyCSqpD1irHfgXpzAytoRn_VNwImNzuGouE",
             authDomain: "barcoapp01.firebaseapp.com",
@@ -285,7 +285,7 @@
         firebase.initializeApp(firebaseConfig);
         const rtdb = firebase.database();
 
-        // --- ADIÇÃO DE SEGURANÇA: LOGIN AUTOMÁTICO ---
+        // --- LOGIN ANÔNIMO AUTOMÁTICO PARA PERMISSÃO DE POSTAGEM ---
         firebase.auth().signInAnonymously().catch(err => console.error("Erro Auth:", err.message));
 
         let currentUser = JSON.parse(localStorage.getItem('barco_user_data'));
@@ -295,7 +295,6 @@
         let allBoatsLocal = [];
         const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
 
-        // Funções de Interface
         function openCustomAlert(msg, title = "Sucesso!") {
             document.getElementById('alert-title').innerText = title;
             document.getElementById('alert-msg').innerText = msg;
@@ -311,7 +310,6 @@
             window.scrollTo(0,0);
         }
 
-        // Login e Inicialização
         function launchApp() {
             const n = document.getElementById('user-name').value.trim();
             const p = document.getElementById('user-phone').value.replace(/\D/g,'');
@@ -333,7 +331,6 @@
             updateStats();
         }
 
-        // Listagem e Filtros
         function listenDynamicShowcase() {
             rtdb.ref('barcos').on('value', snapshot => {
                 const wrapper = document.getElementById('dynamic-showcase-wrapper');
@@ -418,7 +415,6 @@
             });
         }
 
-        // Ações (Votos e Detalhes)
         function openDetails(key) {
             rtdb.ref(`barcos/${currentDayPage}/${key}`).once('value', s => {
                 const b = s.val();
@@ -452,7 +448,6 @@
             });
         }
 
-        // Publicação
         function processImage(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
@@ -477,16 +472,26 @@
             const name = document.getElementById('in-name').value;
             const dateVal = document.getElementById('in-date').value;
             if(!name || !dateVal) return openCustomAlert("Preencha Nome e Data!");
-            const boat = {
-                name, departure: document.getElementById('in-departure').value,
-                origin: document.getElementById('in-origin').value, destiny: document.getElementById('in-destiny').value,
-                date: dateVal, time: document.getElementById('in-time').value,
-                price_p: document.getElementById('in-price-p').value, price_c: document.getElementById('in-price-c').value,
-                tel1: document.getElementById('in-tel-1').value, tel2: document.getElementById('in-tel-2').value,
-                img: currentImg, likes: 0, dislikes: 0, registeredBy: currentUser.phone
-            };
-            const dName = diasSemana[new Date(dateVal.split('-')[0], dateVal.split('-')[1]-1, dateVal.split('-')[2]).getDay()];
-            rtdb.ref('barcos/' + dName).push(boat).then(() => { openCustomAlert("Publicado!"); navigate('screen-main'); });
+            
+            // Força o login anônimo antes de postar para garantir permissão
+            firebase.auth().signInAnonymously().then(() => {
+                const boat = {
+                    name, departure: document.getElementById('in-departure').value,
+                    origin: document.getElementById('in-origin').value, destiny: document.getElementById('in-destiny').value,
+                    date: dateVal, time: document.getElementById('in-time').value,
+                    price_p: document.getElementById('in-price-p').value, price_c: document.getElementById('in-price-c').value,
+                    tel1: document.getElementById('in-tel-1').value, tel2: document.getElementById('in-tel-2').value,
+                    img: currentImg, likes: 0, dislikes: 0, registeredBy: currentUser.phone
+                };
+                const dName = diasSemana[new Date(dateVal.split('-')[0], dateVal.split('-')[1]-1, dateVal.split('-')[2]).getDay()];
+                rtdb.ref('barcos/' + dName).push(boat).then(() => { 
+                    openCustomAlert("Publicado!"); 
+                    navigate('screen-main'); 
+                }).catch(err => {
+                    console.error(err);
+                    alert("Erro ao publicar. Verifique o console.");
+                });
+            });
         }
 
         function listenCarousel() {
@@ -529,7 +534,6 @@
 
         function shareApp() { window.open("https://wa.me/?text=🚢 BarcoApp: " + window.location.href); }
         
-        // --- REGISTRO DO SERVICE WORKER ATUALIZADO ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
