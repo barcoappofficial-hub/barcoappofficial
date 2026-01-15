@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Admin | BarcoApp Control</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --primary: #22d3ee;
+            --primary-glow: rgba(34, 211, 238, 0.3);
+            --bg-dark: #020617;
+            --bg-card: #0f172a;
+            --text-main: #f1f5f9;
+            --text-dim: #94a3b8;
+            --danger: #f43f5e;
+            --success: #10b981;
+            --warning: #fbbf24;
+            --border: rgba(255, 255, 255, 0.08);
+            --sidebar-width: 260px;
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: var(--bg-dark); 
+            color: var(--text-main); 
+            margin: 0; 
+            display: flex; 
+            min-height: 100vh;
+        }
+
+        /* Sidebar Estilizada */
+        .sidebar { 
+            width: var(--sidebar-width); 
+            background: #010409; 
+            height: 100vh; 
+            position: fixed; 
+            border-right: 1px solid var(--border); 
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar h1 { 
+            color: var(--primary); 
+            font-size: 1.4rem; 
+            font-weight: 800;
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            margin-bottom: 50px; 
+        }
+
+        .nav-item { 
+            display: flex; align-items: center; gap: 12px; padding: 14px 15px; 
+            color: var(--text-dim); text-decoration: none; border-radius: 12px; 
+            margin-bottom: 8px; transition: 0.2s; font-weight: 500; font-size: 0.9rem;
+        }
+
+        .nav-item:hover, .nav-item.active { background: rgba(34, 211, 238, 0.08); color: var(--primary); }
+
+        .main { margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); padding: 40px; }
+
+        /* Stats Cards */
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 40px; }
+        .stat-card { background: var(--bg-card); padding: 24px; border-radius: 20px; border: 1px solid var(--border); position: relative; }
+        .stat-card small { color: var(--text-dim); text-transform: uppercase; font-size: 0.7rem; font-weight: 800; }
+        .stat-card h2 { margin: 8px 0 0; font-size: 2.2rem; font-weight: 800; }
+
+        .dashboard-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 30px; }
+
+        .panel { background: var(--bg-card); border-radius: 24px; border: 1px solid var(--border); margin-bottom: 30px; overflow: hidden; }
+        .panel-header { padding: 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01); }
+        .panel-header h3 { margin: 0; font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 12px; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 15px 12px; color: var(--text-dim); font-size: 0.65rem; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+        td { padding: 16px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.85rem; }
+
+        input { width: 100%; background: #020617; border: 1px solid var(--border); padding: 14px; border-radius: 12px; color: white; margin-bottom: 12px; outline: none; box-sizing: border-box; }
+        
+        .btn { padding: 12px 20px; border-radius: 12px; border: none; cursor: pointer; font-weight: 700; transition: 0.3s; font-size: 0.85rem; }
+        .btn-add { background: var(--primary); color: #000; width: 100%; text-transform: uppercase; }
+        .btn-del { background: rgba(244, 63, 94, 0.1); color: var(--danger); padding: 8px 12px; }
+        .btn-wa { background: #10b981; color: white; padding: 8px 12px; margin-right: 5px; }
+
+        .rank-row { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: #020617; border-radius: 14px; margin-bottom: 10px; border: 1px solid var(--border); }
+        .img-preview { width: 60px; height: 35px; border-radius: 6px; object-fit: cover; background: #000; border: 1px solid var(--border); }
+        .tag-dia { background: var(--primary-glow); color: var(--primary); padding: 4px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h1><i class="fas fa-ship"></i> BARCOAPP</h1>
+        <a href="#" class="nav-item active"><i class="fas fa-th-large"></i> Dashboard</a>
+        <a href="#boats-section" class="nav-item"><i class="fas fa-anchor"></i> Escalas</a>
+        <a href="#users-section" class="nav-item"><i class="fas fa-users"></i> Usuários</a>
+        <a href="#carousel-section" class="nav-item"><i class="fas fa-image"></i> Carrossel</a>
+    </div>
+
+    <div class="main">
+        <div class="stats-row">
+            <div class="stat-card"><small>Total Usuários</small><h2 id="total-users">0</h2></div>
+            <div class="stat-card"><small>Barcos Ativos</small><h2 id="total-boats">0</h2></div>
+            <div class="stat-card"><small>Saldo Global</small><h2 id="total-likes">0</h2></div>
+            <div class="stat-card"><small>Status</small><h2 style="color: var(--success); font-size: 1.5rem;">ONLINE</h2></div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="left-side">
+                <div class="panel" id="users-section">
+                    <div class="panel-header"><h3><i class="fas fa-users"></i> Usuários Cadastrados</h3></div>
+                    <div class="panel-body">
+                        <table>
+                            <thead><tr><th>Nome</th><th>WhatsApp</th><th>Likes</th><th>Ações</th></tr></thead>
+                            <tbody id="users-list"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="panel" id="boats-section">
+                    <div class="panel-header"><h3><i class="fas fa-calendar-day"></i> Escalas Ativas</h3></div>
+                    <div class="panel-body">
+                        <table>
+                            <thead><tr><th>Embarcação</th><th>Dia</th><th>Votos</th><th>Gestão</th></tr></thead>
+                            <tbody id="boats-list"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-side">
+                <div class="panel" id="carousel-section" style="border-color: var(--primary);">
+                    <div class="panel-header"><h3><i class="fas fa-images"></i> Banners do Carrossel</h3></div>
+                    <div class="panel-body" style="padding: 20px;">
+                        <div id="carousel-manager" style="max-height: 250px; overflow-y: auto; margin-bottom: 20px;"></div>
+                        <small style="color:var(--primary); font-weight: 800;">NOVO BANNER (URL)</small>
+                        <input type="text" id="car-img" placeholder="URL da Imagem (JPEG/PNG)">
+                        <input type="text" id="car-link" placeholder="Link de destino (opcional)">
+                        <button class="btn btn-add" onclick="saveCarousel()">Publicar no App</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header"><h3><i class="fas fa-broadcast-tower"></i> Alerta Global</h3></div>
+                    <div class="panel-body" style="padding: 20px;">
+                        <input type="text" id="alert-msg" placeholder="Mensagem para todos os usuários...">
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn" style="background: var(--warning); color: #000; flex: 2; font-weight: 800;" onclick="pushAlert()">ATIVAR</button>
+                            <button class="btn" style="background: var(--danger); color: #fff; flex: 1; font-weight: 800;" onclick="removeAlert()">DESATIVAR</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header"><h3><i class="fas fa-trophy"></i> Ranking de Popularidade</h3></div>
+                    <div class="panel-body" id="ranking-list" style="padding: 20px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURAÇÃO FIREBASE BARCOAPP01 (Sincronizado com o App)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCSqpD1irHfgXpzAytoRn_VNwImNzuGouE",
+            authDomain: "barcoapp01.firebaseapp.com",
+            databaseURL: "https://barcoapp01-default-rtdb.firebaseio.com",
+            projectId: "barcoapp01",
+            storageBucket: "barcoapp01.firebasestorage.app",
+            messagingSenderId: "715122174520",
+            appId: "1:715122174520:web:da4ae91a6862c129d714cd"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        function startApp() {
+            db.ref().on('value', snapshot => {
+                const data = snapshot.val();
+                if(!data) return;
+                
+                // Preencher Alerta se estiver ativo
+                if(data.config && data.config.alerta && data.config.alerta.active) {
+                    document.getElementById('alert-msg').value = data.config.alerta.text;
+                }
+
+                const userStats = calculateUserStats(data.barcos, data.usuarios_cadastrados);
+                renderUsers(data.usuarios_cadastrados, userStats);
+                renderBoats(data.barcos);
+                renderCarousel(data.config ? data.config.carrossel : null);
+                renderRanking(userStats);
+            });
+        }
+
+        // Lógica de Cálculo de Pontos
+        function calculateUserStats(barcos, usuarios) {
+            let stats = {};
+            for(let id in usuarios) { stats[id] = { nome: usuarios[id].nome, saldo: 0 }; }
+            if(barcos) {
+                for(let dia in barcos) {
+                    for(let key in barcos[dia]) {
+                        const b = barcos[dia][key];
+                        if(b.registeredBy && stats[b.registeredBy]) {
+                            const saldoBarco = (b.likes || 0) - (b.dislikes || 0);
+                            stats[b.registeredBy].saldo += saldoBarco;
+                        }
+                    }
+                }
+            }
+            return stats;
+        }
+
+        // Renderização de Tabelas
+        function renderUsers(users, stats) {
+            const list = document.getElementById('users-list');
+            list.innerHTML = ""; let count = 0;
+            for(let id in users) {
+                count++;
+                const saldo = stats[id] ? stats[id].saldo : 0;
+                list.innerHTML += `<tr>
+                    <td><b>${users[id].nome}</b></td>
+                    <td>${users[id].whatsapp}</td>
+                    <td><span style="color:${saldo >= 0 ? 'var(--primary)' : 'var(--danger)'}">${saldo}</span></td>
+                    <td>
+                        <button class="btn btn-wa" onclick="window.open('https://wa.me/55${users[id].whatsapp}')"><i class="fab fa-whatsapp"></i></button>
+                        <button class="btn btn-del" onclick="deleteUser('${id}')"><i class="fas fa-user-slash"></i></button>
+                    </td>
+                </tr>`;
+            }
+            document.getElementById('total-users').innerText = count;
+        }
+
+        function renderBoats(barcos) {
+            const list = document.getElementById('boats-list');
+            list.innerHTML = ""; let bCount = 0; let totalSaldoGlobal = 0;
+            if(barcos) {
+                for(let dia in barcos) {
+                    for(let key in barcos[dia]) {
+                        const b = barcos[dia][key];
+                        bCount++; 
+                        const saldo = (b.likes || 0) - (b.dislikes || 0);
+                        totalSaldoGlobal += saldo;
+                        list.innerHTML += `<tr>
+                            <td>${b.name}</td>
+                            <td><span class="tag-dia">${dia}</span></td>
+                            <td><span style="color:var(--success)">+${b.likes || 0}</span> / <span style="color:var(--danger)">-${b.dislikes || 0}</span></td>
+                            <td><button class="btn btn-del" onclick="deleteBoat('${dia}','${key}')">Excluir</button></td>
+                        </tr>`;
+                    }
+                }
+            }
+            document.getElementById('total-boats').innerText = bCount;
+            document.getElementById('total-likes').innerText = totalSaldoGlobal;
+        }
+
+        function renderCarousel(slides) {
+            const container = document.getElementById('carousel-manager');
+            container.innerHTML = "";
+            if(!slides) return;
+            Object.keys(slides).forEach(key => {
+                const s = slides[key];
+                container.innerHTML += `
+                    <div class="rank-row">
+                        <img src="${s.img}" class="img-preview" onerror="this.src='https://via.placeholder.com/60x35'">
+                        <div style="flex:1; margin-left:10px; overflow:hidden">
+                            <div style="font-size:0.6rem; color:var(--text-dim); white-space:nowrap; text-overflow:ellipsis;">${s.link || 'Sem link'}</div>
+                        </div>
+                        <button class="btn btn-del" onclick="deleteSlide('${key}')"><i class="fas fa-times"></i></button>
+                    </div>`;
+            });
+        }
+
+        // Funções de Escrita no Banco
+        function saveCarousel() {
+            const img = document.getElementById('car-img').value;
+            const link = document.getElementById('car-link').value;
+            if(!img) return alert("Insira a URL da imagem!");
+            db.ref('config/carrossel').push({ img, link }).then(() => {
+                document.getElementById('car-img').value = "";
+                document.getElementById('car-link').value = "";
+            });
+        }
+
+        function deleteSlide(key) { if(confirm("Remover este banner?")) db.ref(`config/carrossel/${key}`).remove(); }
+
+        function pushAlert() {
+            const text = document.getElementById('alert-msg').value;
+            if(!text) return alert("Digite o texto do alerta!");
+            db.ref('config/alerta').set({ text, active: true }).then(() => alert("Alerta ativado no App!"));
+        }
+
+        function removeAlert() {
+            db.ref('config/alerta').set({ text: "", active: false }).then(() => {
+                document.getElementById('alert-msg').value = "";
+                alert("Alerta desativado!");
+            });
+        }
+
+        function renderRanking(stats) {
+            const div = document.getElementById('ranking-list');
+            let arr = Object.values(stats);
+            arr.sort((a,b) => b.saldo - a.saldo);
+            div.innerHTML = arr.slice(0,5).map((u, i) => `
+                <div class="rank-row">
+                    <span>${i+1}º ${u.nome}</span>
+                    <span class="tag-dia">${u.saldo} PTS</span>
+                </div>`).join('');
+        }
+
+        function deleteUser(uid) { if(confirm("Deseja banir este usuário? Todas as postagens dele continuarão, mas ele perderá o acesso.")) db.ref(`usuarios_cadastrados/${uid}`).remove(); }
+        function deleteBoat(dia, key) { if(confirm("Excluir esta escala permanentemente?")) db.ref(`barcos/${dia}/${key}`).remove(); }
+
+        startApp();
+    </script>
+</body>
+</html>
