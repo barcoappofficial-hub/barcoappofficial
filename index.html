@@ -7,8 +7,8 @@
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         body {
             margin: 0; padding: 0; height: 100vh;
@@ -20,16 +20,19 @@
             color: white;
         }
 
-        /* USANDO A NOVA IMAGEM icone.png */
-        .app-icon {
+        /* Moldura para o ícone */
+        .icon-container {
             width: 100px; height: 100px;
-            background-image: url('icone.png');
-            background-size: cover;
-            background-position: center;
-            border-radius: 25px;
             margin-bottom: 10px;
+            border-radius: 25px;
+            background-color: rgba(255,255,255,0.1); /* Fundo temporário enquanto a imagem não carrega */
             box-shadow: 0 10px 20px rgba(0,0,0,0.4);
             border: 2px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+        }
+
+        .icon-container img {
+            width: 100%; height: 100%; object-fit: cover;
         }
 
         .btn-main {
@@ -41,7 +44,10 @@
     </style>
 </head>
 <body>
-    <div class="app-icon"></div>
+
+    <div class="icon-container">
+        <img src="icone.png" alt="BarcoApp" onerror="this.style.display='none'">
+    </div>
 
     <h1 style="font-size:3rem; margin:0;">BarcoApp</h1>
     <p>Instale agora para ver as escalas oficiais.</p>
@@ -63,16 +69,20 @@
     </a>
 
     <script>
-        // Registro do Service Worker (Essencial para o Android liberar o botão)
+        // 1. REGISTRO DO SERVICE WORKER (ISSO É O QUE ATIVA O BOTÃO)
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
+            navigator.serviceWorker.register('sw.js').then(function() {
+                console.log("Service Worker Registrado!");
+            });
         }
 
+        // 2. LÓGICA DO BOTÃO (EXATAMENTE A QUE VOCÊ GOSTA)
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('Android detectou o PWA!');
             e.preventDefault();
             deferredPrompt = e;
-            // Só mostra o botão quando o Android confirmar que o PWA está ok
+            // Mostra o botão
             document.getElementById('btnInstall').style.display = 'flex';
         });
 
@@ -82,6 +92,7 @@
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') {
                     deferredPrompt = null;
+                    document.getElementById('btnInstall').style.display = 'none';
                 }
             }
         });
