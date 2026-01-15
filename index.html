@@ -285,8 +285,12 @@
         firebase.initializeApp(firebaseConfig);
         const rtdb = firebase.database();
 
-        // --- LOGIN ANÔNIMO AUTOMÁTICO PARA PERMISSÃO DE POSTAGEM ---
-        firebase.auth().signInAnonymously().catch(err => console.error("Erro Auth:", err.message));
+        // --- ADIÇÃO DE SEGURANÇA: LOGIN AUTOMÁTICO PARA LIBERAR POSTAGEM ---
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user) {
+                firebase.auth().signInAnonymously().catch(err => console.error("Erro Auth:", err.message));
+            }
+        });
 
         let currentUser = JSON.parse(localStorage.getItem('barco_user_data'));
         let currentImg = "";
@@ -295,6 +299,7 @@
         let allBoatsLocal = [];
         const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
 
+        // Funções de Interface
         function openCustomAlert(msg, title = "Sucesso!") {
             document.getElementById('alert-title').innerText = title;
             document.getElementById('alert-msg').innerText = msg;
@@ -310,6 +315,7 @@
             window.scrollTo(0,0);
         }
 
+        // Login e Inicialização
         function launchApp() {
             const n = document.getElementById('user-name').value.trim();
             const p = document.getElementById('user-phone').value.replace(/\D/g,'');
@@ -331,6 +337,7 @@
             updateStats();
         }
 
+        // Listagem e Filtros
         function listenDynamicShowcase() {
             rtdb.ref('barcos').on('value', snapshot => {
                 const wrapper = document.getElementById('dynamic-showcase-wrapper');
@@ -415,6 +422,7 @@
             });
         }
 
+        // Ações (Votos e Detalhes)
         function openDetails(key) {
             rtdb.ref(`barcos/${currentDayPage}/${key}`).once('value', s => {
                 const b = s.val();
@@ -448,6 +456,7 @@
             });
         }
 
+        // Publicação
         function processImage(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
@@ -469,27 +478,38 @@
         }
 
         function publish() {
-            const name = document.getElementById('in-name').value;
-            const dateVal = document.getElementById('in-date').value;
-            if(!name || !dateVal) return openCustomAlert("Preencha Nome e Data!");
+            const nameInput = document.getElementById('in-name');
+            const dateInput = document.getElementById('in-date');
             
-            // Força o login anônimo antes de postar para garantir permissão
+            if(!nameInput.value || !dateInput.value) return openCustomAlert("Preencha Nome e Data!", "Erro");
+
+            // Garante Auth antes da postagem
             firebase.auth().signInAnonymously().then(() => {
                 const boat = {
-                    name, departure: document.getElementById('in-departure').value,
-                    origin: document.getElementById('in-origin').value, destiny: document.getElementById('in-destiny').value,
-                    date: dateVal, time: document.getElementById('in-time').value,
-                    price_p: document.getElementById('in-price-p').value, price_c: document.getElementById('in-price-c').value,
-                    tel1: document.getElementById('in-tel-1').value, tel2: document.getElementById('in-tel-2').value,
-                    img: currentImg, likes: 0, dislikes: 0, registeredBy: currentUser.phone
+                    name: nameInput.value,
+                    departure: document.getElementById('in-departure').value,
+                    origin: document.getElementById('in-origin').value,
+                    destiny: document.getElementById('in-destiny').value,
+                    date: dateInput.value,
+                    time: document.getElementById('in-time').value,
+                    price_p: document.getElementById('in-price-p').value,
+                    price_c: document.getElementById('in-price-c').value,
+                    tel1: document.getElementById('in-tel-1').value,
+                    tel2: document.getElementById('in-tel-2').value,
+                    img: currentImg,
+                    likes: 0,
+                    dislikes: 0,
+                    registeredBy: currentUser ? currentUser.phone : "Sistema"
                 };
-                const dName = diasSemana[new Date(dateVal.split('-')[0], dateVal.split('-')[1]-1, dateVal.split('-')[2]).getDay()];
+                
+                const dName = diasSemana[new Date(dateInput.value.split('-')[0], dateInput.value.split('-')[1]-1, dateInput.value.split('-')[2]).getDay()];
+                
                 rtdb.ref('barcos/' + dName).push(boat).then(() => { 
-                    openCustomAlert("Publicado!"); 
+                    openCustomAlert("Publicado com sucesso!"); 
                     navigate('screen-main'); 
                 }).catch(err => {
-                    console.error(err);
-                    alert("Erro ao publicar. Verifique o console.");
+                    console.error("Erro na publicação:", err);
+                    alert("Erro de permissão. Tente novamente em instantes.");
                 });
             });
         }
@@ -519,10 +539,12 @@
             rtdb.ref('barcos').on('value', s => {
                 let l = 0; const d = s.val();
                 if(d) Object.values(d).forEach(dia => {
-                    Object.values(dia).forEach(b => { if(b.registeredBy === currentUser.phone) l += ((b.likes || 0) - (b.dislikes || 0)); });
+                    Object.values(dia).forEach(b => { if(currentUser && b.registeredBy === currentUser.phone) l += ((b.likes || 0) - (b.dislikes || 0)); });
                 });
-                document.getElementById('total-likes-count').innerText = l;
-                document.getElementById('thermometer-bar').style.width = Math.min((l/1000)*100, 100) + '%';
+                const lCount = document.getElementById('total-likes-count');
+                const tBar = document.getElementById('thermometer-bar');
+                if(lCount) lCount.innerText = l;
+                if(tBar) tBar.style.width = Math.min((l/1000)*100, 100) + '%';
             });
         }
 
@@ -534,14 +556,6 @@
 
         function shareApp() { window.open("https://wa.me/?text=🚢 BarcoApp: " + window.location.href); }
         
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('BarcoApp: Service Worker Ativo!', reg.scope))
-                    .catch(err => console.log('BarcoApp: Erro no Service Worker:', err));
-            });
-        }
-
         window.onload = () => { if(currentUser) startApp(); };
     </script>
 </body>
