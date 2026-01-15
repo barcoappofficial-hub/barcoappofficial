@@ -2,28 +2,25 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Instalar BarcoApp</title>
-    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
         body {
             margin: 0; padding: 0; height: 100vh;
             font-family: sans-serif;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             text-align: center;
-            background: linear-gradient(rgba(7, 11, 20, 0.85), rgba(7, 11, 20, 0.85)), url('fundoentrada.png');
+            background: linear-gradient(rgba(7, 11, 20, 0.8), rgba(7, 11, 20, 0.8)), url('fundoentrada.png');
             background-size: cover; background-position: center;
-            color: white;
+            color: white; padding: 20px;
         }
-        .icon-box {
-            width: 100px; height: 100px; margin-bottom: 15px;
-            border-radius: 25px; overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.2);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+        .logo-box {
+            width: 100px; height: 100px; border-radius: 25px;
+            margin-bottom: 15px; border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); overflow: hidden;
         }
         .btn-main {
             width: 280px; padding: 18px; border-radius: 15px; border: none;
@@ -34,21 +31,18 @@
     </style>
 </head>
 <body>
-
-    <div class="icon-box">
+    <div class="logo-box">
         <img src="icone.png" style="width:100%; height:100%; object-fit:cover;">
     </div>
 
-    <h1 style="font-size:2.8rem; margin:0;">BarcoApp</h1>
-    <p style="margin-bottom:30px; opacity:0.8;">Sua escala oficial de embarcações.</p>
+    <h1 style="font-size:3rem; margin:0;">BarcoApp</h1>
+    <p style="opacity:0.8;">Instale para ver as escalas oficiais.</p>
 
-    <div style="background: rgba(0,0,0,0.5); padding: 25px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);">
-        <p style="font-size: 0.75rem; font-weight: 800; margin-bottom: 15px; opacity: 0.6;">INSTALAR NO CELULAR</p>
-        
+    <div style="background: rgba(0,0,0,0.6); padding: 25px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);">
+        <p style="font-size: 0.75rem; font-weight: 800; margin-bottom: 20px; opacity: 0.6;">ESCOLHA SEU CELULAR</p>
         <button id="btnInstall" class="btn-main" style="background: #3ddc84; color: #000; display: none;">
             <i class="fab fa-android"></i> INSTALAR ANDROID
         </button>
-        
         <button onclick="alert('No iPhone: Toque em Compartilhar e Adicionar à Tela de Início')" class="btn-main" style="background: #fff; color: #000;">
             <i class="fab fa-apple"></i> INSTALAR IPHONE
         </button>
@@ -59,7 +53,6 @@
     </a>
 
     <script>
-        // REGISTRO IMEDIATO DO SERVICE WORKER
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').then(() => console.log("SW OK"));
         }
@@ -68,7 +61,6 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            // FORÇA O BOTÃO A APARECER
             document.getElementById('btnInstall').style.display = 'flex';
         });
 
@@ -77,10 +69,8 @@
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') deferredPrompt = null;
-            } else {
-                alert("Para instalar: Clique nos 3 pontinhos do Chrome e vá em 'Instalar aplicativo'.");
             }
         });
     </script>
 </body>
-</html>s
+</html>
