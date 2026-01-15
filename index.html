@@ -41,11 +41,13 @@
     <div style="background: rgba(0,0,0,0.6); padding: 25px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);">
         <p style="font-size: 0.75rem; font-weight: 800; margin-bottom: 20px; letter-spacing: 1px; color: #94a3b8;">ESCOLHA SEU CELULAR</p>
         
+        <!-- BOTÃO ANDROID (APARECE AUTOMATICAMENTE) -->
         <button id="btnInstall" class="btn-main" style="background: #3ddc84; color: #000; display: none;">
             <i class="fab fa-android"></i> 1. INSTALAR ANDROID
         </button>
         
-        <button onclick="alert('No iPhone: Toque no ícone de Compartilhar (seta para cima) e escolha Adicionar à Tela de Início')" class="btn-main" style="background: #fff; color: #000;">
+        <!-- BOTÃO IPHONE -->
+        <button onclick="alert('📱 No iPhone: Toque em Compartilhar → Adicionar à Tela de Início')" class="btn-main" style="background: #fff; color: #000;">
             <i class="fab fa-apple"></i> 2. INSTALAR IPHONE
         </button>
     </div>
@@ -55,38 +57,39 @@
     </a>
 
     <script>
-        // 2. REGISTRO DO SERVICE WORKER (ESSENCIAL PARA O BOTÃO APARECER)
+        // 1. REGISTRO DO SERVICE WORKER
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('Service Worker pronto!', reg))
-                .catch(err => console.error('Erro no Service Worker', err));
-            });
+            navigator.serviceWorker.register('sw.js')
+            .then(() => console.log('Service Worker registrado!'))
+            .catch(err => console.log('Erro no SW', err));
         }
 
-        // 3. LÓGICA DO PROMPT DE INSTALAÇÃO
+        // 2. CONTROLE DO BOTÃO DE INSTALAÇÃO
         let deferredPrompt;
         const btnAndroid = document.getElementById('btnInstall');
 
         window.addEventListener('beforeinstallprompt', (e) => {
-            console.log('O Chrome liberou a instalação!');
+            console.log('beforeinstallprompt disparado!');
             e.preventDefault();
             deferredPrompt = e;
-            // O botão só aparece quando o Chrome dá o sinal verde
             btnAndroid.style.display = 'flex'; 
         });
 
         btnAndroid.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    deferredPrompt = null;
-                    btnAndroid.style.display = 'none';
-                }
-            } else {
-                alert("Para instalar agora: Clique nos 3 pontinhos do Chrome (topo direito) e escolha 'Instalar aplicativo'.");
+            if (!deferredPrompt) {
+                alert("👉 Abra o menu (3 pontinhos) e toque em 'Instalar App'");
+                return;
             }
+
+            deferredPrompt.prompt();
+            const escolha = await deferredPrompt.userChoice;
+            if (escolha.outcome === 'accepted') {
+                console.log('Usuário instalou!');
+                btnAndroid.style.display = 'none';
+            } else {
+                console.log('Usuário cancelou a instalação');
+            }
+            deferredPrompt = null;
         });
     </script>
 </body>
