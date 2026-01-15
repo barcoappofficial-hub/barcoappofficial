@@ -18,6 +18,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
 
     <style>
         :root {
@@ -283,6 +284,9 @@
         };
         firebase.initializeApp(firebaseConfig);
         const rtdb = firebase.database();
+
+        // --- ADIÇÃO DE SEGURANÇA: LOGIN AUTOMÁTICO ---
+        firebase.auth().signInAnonymously().catch(err => console.error("Erro Auth:", err.message));
 
         let currentUser = JSON.parse(localStorage.getItem('barco_user_data'));
         let currentImg = "";
