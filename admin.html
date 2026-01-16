@@ -83,7 +83,6 @@
         
         .badge { background: var(--danger); color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; margin-left: 5px; }
         
-        /* Ajuste do Item da Frota */
         .fleet-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.03); margin-bottom: 8px; border-radius: 12px; border: 1px solid transparent; transition: 0.2s; }
         .fleet-item:hover { border-color: var(--primary); background: rgba(34, 211, 238, 0.05); }
     </style>
@@ -255,7 +254,7 @@
             function initDashboard() {
                 db.ref().on('value', snap => {
                     const data = snap.val();
-                    if(!data) { renderFleet(null); return; } // Renderiza vazio se nao tiver dados
+                    if(!data) { renderFleet(null); return; }
                     
                     updateStats(data);
                     renderFleet(data.barcos_cadastrados);
