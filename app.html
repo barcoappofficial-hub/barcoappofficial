@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BarcoApp | Oficial</title>
+    <title>BarcoApp | Premium</title>
 
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#020617">
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -25,88 +25,235 @@
 
     <style>
         :root {
-            --bg-dark: #070b14; --card-dark: #111827; --accent-cyan: #22d3ee;
-            --accent-purple: #a855f7; --accent-green: #22c55e; --accent-yellow: #fbbf24;
-            --text-white: #f8fafc; --text-dim: #94a3b8; --glass: rgba(255, 255, 255, 0.05);
-            --gradient: linear-gradient(135deg, #22d3ee 0%, #a855f7 100%);
+            --bg-dark: #020617; 
+            --bg-card: #0f172a;
+            --accent-cyan: #06b6d4;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-green: #10b981;
+            --accent-yellow: #f59e0b;
+            --text-white: #f8fafc; 
+            --text-dim: #94a3b8; 
+            --glass: rgba(30, 41, 59, 0.7);
+            --border-light: rgba(255, 255, 255, 0.08);
+            --gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            --shadow-glow: 0 0 20px rgba(6, 182, 212, 0.15);
         }
         
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        button, .search-item, .input-premium, .fab, select { transition: all 0.2s ease; }
-        body, html { margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-dark); color: var(--text-white); overflow-x: hidden; height: 100%; scroll-behavior: smooth; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         
-        .main-container { display: flex; flex-direction: column; min-height: 100vh; padding-bottom: 100px; }
+        body, html { 
+            margin: 0; padding: 0; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: var(--bg-dark); 
+            color: var(--text-white); 
+            overflow-x: hidden; height: 100%; 
+            user-select: none; /* Sensação de App Nativo */
+        }
+
+        /* FUNDO COM DETALHE RADIAL */
+        body::before {
+            content: ''; position: fixed; top: -20%; left: -20%; width: 140%; height: 140%;
+            background: radial-gradient(circle at 50% 0%, rgba(6, 182, 212, 0.08), transparent 60%);
+            z-index: -1; pointer-events: none;
+        }
+        
+        .main-container { display: flex; flex-direction: column; min-height: 100vh; padding-bottom: 110px; }
         .showcase-container { margin: 25px 0; padding-left: 20px; }
         
+        /* BOTÕES */
+        button { cursor: pointer; border: none; font-family: inherit; transition: transform 0.1s ease, opacity 0.2s; }
+        button:active { transform: scale(0.97); opacity: 0.9; }
+
+        .btn-main { 
+            width: 100%; padding: 16px; border-radius: 16px; 
+            background: var(--gradient); color: white; 
+            font-weight: 700; font-size: 0.95rem; letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+        }
+        
         .btn-open-week {
-            background: var(--gradient); border: none; margin: 10px 20px; padding: 18px; border-radius: 20px;
-            display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 800; color: #000; cursor: pointer;
-            box-shadow: 0 10px 20px rgba(34, 211, 238, 0.15); will-change: transform;
+            background: var(--bg-card); border: 1px solid var(--border-light);
+            margin: 15px 20px; padding: 16px; border-radius: 18px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            font-weight: 700; color: var(--text-white);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
-        .btn-open-week:active { transform: scale(0.98); }
+        .btn-open-week i { color: var(--accent-cyan); }
 
-        .search-wrapper { margin: 5px 20px 15px 20px; position: relative; z-index: 1005; }
-        .search-bar { width: 100%; background: var(--card-dark); border: 1px solid var(--glass); padding: 16px 20px 16px 45px; border-radius: 18px; color: white; font-family: inherit; font-size: 0.9rem; outline: none; }
-        .search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--accent-cyan); }
-        .search-results-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: #111827; border: 1px solid var(--glass); border-radius: 18px; margin-top: 8px; max-height: 250px; overflow-y: auto; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .search-item { padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 2px; cursor: pointer; }
+        /* INPUTS E SELECTS */
+        .input-group { margin-bottom: 15px; position: relative; }
         
-        .week-modal { display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 75%; background: #0f172a; border-top: 3px solid var(--accent-cyan); border-radius: 30px 30px 0 0; z-index: 2000; padding: 25px; box-shadow: 0 -10px 40px rgba(0,0,0,0.8); overflow-y: auto; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .week-modal.active { display: block; transform: translateY(0); }
-        .day-row { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; font-weight: 700; cursor: pointer;}
-
-        .feed { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 20px; }
-        .boat-card { background: var(--card-dark); border-radius: 24px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); position: relative; box-shadow: 0 10px 20px rgba(0,0,0,0.3); height: 100%; display: flex; flex-direction: column; }
-        .boat-img-container { position: relative; width: 100%; padding-top: 75%; background: #1f2937; }
-        .boat-img { position: absolute; top:0; left:0; width: 100%; height: 100%; object-fit: cover; }
-        .boat-overlay-name { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.95)); padding: 20px 10px 8px 10px; font-weight: 800; font-size: 0.85rem; color: #fff; text-transform: uppercase; }
-        .route-box { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.65rem; font-weight: 700; color: var(--text-dim); padding: 12px 5px; background: rgba(0,0,0,0.2); margin-top: auto; }
-
-        .btn-main { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--gradient); color: white; font-weight: 800; cursor: pointer; }
-        .fab-container { position: fixed; bottom: 30px; right: 20px; display: flex; flex-direction: column; gap: 12px; z-index: 999; }
-        .fab { width: 56px; height: 56px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; box-shadow: 0 5px 15px rgba(0,0,0,0.4); cursor: pointer; }
+        .input-premium, .select-boat {
+            width: 100%; padding: 16px 16px 16px 45px; border-radius: 16px; 
+            background: rgba(15, 23, 42, 0.6); 
+            border: 1px solid var(--border-light);
+            color: white; font-weight: 500; font-size: 0.95rem;
+            transition: all 0.3s ease; appearance: none;
+        }
+        .input-premium:focus, .select-boat:focus { border-color: var(--accent-cyan); background: rgba(15, 23, 42, 0.9); }
         
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; align-items: center; justify-content: center; padding: 15px; backdrop-filter: blur(5px); }
-        .modal-content { background: var(--card-dark); width: 100%; max-width: 450px; border-radius: 30px; overflow-y: auto; max-height: 90vh; border: 1px solid var(--glass); position: relative;}
-        .day-tag-float { position: absolute; top: 8px; left: 8px; background: var(--accent-cyan); color: #000; font-size: 0.55rem; padding: 2px 8px; border-radius: 6px; font-weight: 800; z-index: 10; }
-        .input-premium { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--glass); background: #0c121e; color: white; outline: none; }
-        .btn-close-modal { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.5); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; z-index: 10; cursor: pointer;}
-
-        #custom-alert, #exit-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .alert-card, .exit-card { background: var(--card-dark); width: 85%; max-width: 320px; padding: 30px; border-radius: 30px; text-align: center; border: 1px solid var(--accent-cyan); box-shadow: 0 0 30px rgba(34, 211, 238, 0.2); }
-
         .select-boat {
-            width: 100%; padding: 16px; border-radius: 12px; 
-            background: #1f2937; border: 1px solid var(--accent-cyan); 
-            color: white; font-weight: 700; outline: none; margin-bottom: 20px;
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2322d3ee%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
-            background-repeat: no-repeat; background-position: right 15px top 50%; background-size: 12px auto; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 15px center; background-size: 18px;
+            padding-left: 15px;
         }
 
-        /* Estilo para área de cadastro de novo barco */
-        .new-boat-section { border: 1px dashed var(--accent-cyan); padding: 15px; border-radius: 15px; background: rgba(34, 211, 238, 0.05); margin-bottom: 20px; display: none; }
-        .upload-trigger { width: 100%; height: 100px; border: 2px dashed var(--text-dim); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-dim); cursor: pointer; margin-bottom: 10px; }
-        .upload-trigger i { font-size: 1.5rem; margin-bottom: 5px; }
+        /* BUSCA */
+        .search-wrapper { margin: 10px 20px 20px 20px; position: relative; z-index: 1005; }
+        .search-bar {
+            width: 100%; background: rgba(30, 41, 59, 0.5); border: 1px solid var(--border-light);
+            padding: 15px 20px 15px 50px; border-radius: 20px; color: white;
+            font-family: inherit; font-size: 0.95rem; backdrop-filter: blur(10px);
+        }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--accent-cyan); opacity: 0.8; }
+
+        .search-results-dropdown {
+            position: absolute; top: 110%; left: 0; right: 0;
+            background: #1e293b; border: 1px solid var(--border-light);
+            border-radius: 16px; max-height: 250px; overflow-y: auto; 
+            display: none; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        .search-item { padding: 14px 18px; border-bottom: 1px solid var(--border-light); display: flex; flex-direction: column; gap: 4px; }
+        .search-item:last-child { border-bottom: none; }
+        .search-item span:first-child { color: var(--accent-cyan); font-weight: 700; font-size: 0.9rem; }
+        .search-item span:last-child { color: var(--text-dim); font-size: 0.75rem; }
+
+        /* CARDS DE BARCO */
+        .boat-card { 
+            background: var(--bg-card); border-radius: 22px; overflow: hidden; 
+            border: 1px solid var(--border-light); position: relative; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+            height: 100%; display: flex; flex-direction: column;
+            transition: transform 0.2s;
+        }
+        .boat-card:active { transform: scale(0.98); }
+        
+        .boat-img-container { position: relative; width: 100%; padding-top: 70%; background: #1e293b; }
+        .boat-img { position: absolute; top:0; left:0; width: 100%; height: 100%; object-fit: cover; }
+        
+        .boat-overlay-name { 
+            position: absolute; bottom: 0; left: 0; right: 0; 
+            background: linear-gradient(to top, rgba(2,6,23,0.95), transparent); 
+            padding: 30px 12px 10px 12px; 
+            font-weight: 800; font-size: 0.9rem; color: #fff; text-transform: uppercase; 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .route-box { 
+            display: flex; align-items: center; justify-content: center; gap: 8px; 
+            font-size: 0.75rem; font-weight: 700; color: var(--text-dim); 
+            padding: 12px 8px; background: rgba(0,0,0,0.2); margin-top: auto; 
+        }
+
+        /* MODAIS E BOTTOM SHEETS */
+        .modal, .week-modal { z-index: 2000; }
+        .modal { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(8px);
+            align-items: flex-end; /* Mobile Bottom Sheet Style */
+            justify-content: center; 
+        }
+        
+        /* Ajuste para Desktop */
+        @media(min-width: 600px) { .modal { align-items: center; } .modal-content { border-radius: 30px !important; } }
+
+        .modal-content, .week-modal { 
+            background: #111827; width: 100%; max-width: 500px; 
+            border-radius: 30px 30px 0 0; 
+            border-top: 1px solid var(--border-light);
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.6);
+            position: relative; overflow-y: auto; max-height: 90vh;
+        }
+        
+        .week-modal { position: fixed; bottom: 0; left: 0; height: 70%; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); display: block; visibility: hidden; }
+        .week-modal.active { transform: translateY(0); visibility: visible; }
+
+        .modal-drag-handle { width: 40px; height: 5px; background: var(--border-light); border-radius: 10px; margin: 15px auto 5px auto; }
+
+        .btn-close-modal { 
+            position: absolute; top: 20px; right: 20px; 
+            background: rgba(0,0,0,0.4); color: white; border: none; 
+            width: 32px; height: 32px; border-radius: 50%; z-index: 10; 
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* STATS CARD */
+        .stats-box { background: rgba(30, 41, 59, 0.4); margin: 20px; padding: 20px; border-radius: 24px; border: 1px solid var(--border-light); position: relative; overflow: hidden; }
+        .thermometer-container { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 10px; overflow: hidden; }
+        .thermometer-fill { height: 100%; width: 0%; background: var(--gradient); border-radius: 10px; transition: width 1.5s ease-out; box-shadow: 0 0 10px var(--accent-cyan); }
+
+        /* FAB */
+        .fab-container { position: fixed; bottom: 30px; right: 20px; display: flex; flex-direction: column; gap: 15px; z-index: 999; }
+        .fab { 
+            width: 56px; height: 56px; border-radius: 18px; 
+            color: white; font-size: 1.4rem; 
+            display: flex; align-items: center; justify-content: center; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* UPLOAD NOVA EMBARCAÇÃO */
+        .new-boat-section { 
+            border: 2px dashed var(--border-light); padding: 20px; border-radius: 20px; 
+            background: rgba(30, 41, 59, 0.3); margin-bottom: 20px; 
+            display: none; text-align: center;
+        }
+        .upload-trigger { 
+            width: 100%; height: 120px; border-radius: 16px; background: rgba(0,0,0,0.2);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            color: var(--text-dim); margin-bottom: 15px; position: relative; overflow: hidden;
+        }
+        
+        /* TAGS FLUTUANTES */
+        .day-tag-float { 
+            position: absolute; top: 10px; left: 10px; 
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+            color: var(--accent-cyan); font-size: 0.65rem; 
+            padding: 4px 10px; border-radius: 8px; font-weight: 800; z-index: 10; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .price-tag-float {
+            position: absolute; top: 10px; right: 10px;
+            background: var(--accent-green); color: #000;
+            font-size: 0.7rem; padding: 4px 8px; border-radius: 8px; font-weight: 800; z-index: 10;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+        }
+
+        /* ALERTS */
+        .alert-card { background: #1e293b; border: 1px solid var(--accent-cyan); border-radius: 24px; padding: 30px; text-align: center; width: 85%; max-width: 320px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+        #custom-alert, #exit-modal { z-index: 10000; }
+        
+        .exit-btn-group { display: flex; gap: 15px; margin-top: 20px; }
+        .btn-exit-yes { background: #ef4444; flex: 1; padding: 15px; border-radius: 14px; color: white; font-weight: 800; }
+        .btn-exit-no { background: rgba(255,255,255,0.1); flex: 1; padding: 15px; border-radius: 14px; color: white; font-weight: 800; }
+
+        /* LISTA DIAS */
+        .day-row { padding: 20px; border-bottom: 1px solid var(--border-light); font-weight: 600; color: var(--text-dim); display: flex; justify-content: space-between; align-items: center; }
+        .day-row:active { background: var(--border-light); }
+        .day-row i { color: var(--accent-cyan); font-size: 0.8rem; }
+
     </style>
 </head>
 <body>
 
     <div id="custom-alert">
         <div class="alert-card">
-            <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--accent-green); margin-bottom: 15px;"></i>
-            <h3 id="alert-title" style="margin:0;">Sucesso!</h3>
+            <div style="width:60px; height:60px; border-radius:50%; background:rgba(34,211,238,0.1); display:flex; align-items:center; justify-content:center; margin:0 auto 15px auto;">
+                <i class="fas fa-check" style="font-size: 1.5rem; color: var(--accent-cyan);"></i>
+            </div>
+            <h3 id="alert-title" style="margin:0; color: white;">Sucesso!</h3>
             <p id="alert-msg" style="color: var(--text-dim); font-size: 0.9rem; margin-top: 10px;"></p>
-            <button class="btn-main" onclick="closeCustomAlert()" style="margin-top: 20px;">OK</button>
+            <button class="btn-main" onclick="closeCustomAlert()" style="margin-top: 20px;">ENTENDI</button>
         </div>
     </div>
 
-    <div id="global-alert" style="display:none; background: var(--accent-yellow); color: #000; padding: 14px; font-weight: 800; text-align: center; font-size: 0.75rem; position: sticky; top: 0; z-index: 1001;">
-        <i class="fas fa-bullhorn"></i> <span id="alert-text"></span>
+    <div id="global-alert" style="display:none; background: var(--accent-yellow); color: #000; padding: 12px; font-weight: 700; text-align: center; font-size: 0.8rem; position: sticky; top: 0; z-index: 1001; box-shadow: 0 5px 15px rgba(245, 158, 11, 0.2);">
+        <i class="fas fa-bullhorn" style="margin-right:5px;"></i> <span id="alert-text"></span>
     </div>
 
     <div id="exit-modal">
-        <div class="exit-card">
-            <h3 style="margin:0;">Fechar o App?</h3>
+        <div class="exit-card alert-card" style="border-color: var(--border-light);">
+            <h3 style="margin:0; color: white;">Sair do App?</h3>
+            <p style="color: var(--text-dim); margin-top: 10px;">Tem certeza que deseja fechar?</p>
             <div class="exit-btn-group">
                 <button class="btn-exit-yes" onclick="confirmExitApp()">SIM</button>
                 <button class="btn-exit-no" onclick="closeExitModal()">NÃO</button>
@@ -114,53 +261,70 @@
         </div>
     </div>
 
-    <section id="screen-welcome" style="height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:30px; text-align:center;">
-        <h1 style="font-size:3.5rem; font-weight:900; background:var(--gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin:0;">BarcoApp</h1>
-        <p style="color:var(--text-dim); margin-bottom:40px;">Sua escala oficial de embarcações.</p>
-        <div style="width:100%; max-width:350px;">
-            <input type="text" id="user-name" class="input-premium" placeholder="Seu Nome" style="margin-bottom:12px;">
-            <input type="tel" id="user-phone" class="input-premium" placeholder="WhatsApp com DDD" style="margin-bottom:25px;">
-            <button class="btn-main" onclick="launchApp()">ENTRAR NO APP</button>
+    <section id="screen-welcome" style="height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:30px; text-align:center; background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);">
+        <div style="width:80px; height:80px; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue)); border-radius: 24px; display:flex; align-items:center; justify-content:center; margin-bottom:20px; box-shadow: 0 10px 30px rgba(6,182,212,0.4);">
+            <i class="fas fa-ship" style="font-size:2.5rem; color:white;"></i>
+        </div>
+        <h1 style="font-size:2.5rem; font-weight:800; color:white; margin:0;">BarcoApp</h1>
+        <p style="color:var(--text-dim); margin-bottom:40px; font-size:0.95rem;">Sua escala oficial de embarcações.</p>
+        
+        <div style="width:100%; max-width:320px; display:flex; flex-direction:column; gap:15px;">
+            <div style="position:relative;">
+                <i class="fas fa-user" style="position:absolute; left:15px; top:15px; color:var(--text-dim);"></i>
+                <input type="text" id="user-name" class="input-premium" placeholder="Seu Nome">
+            </div>
+            <div style="position:relative;">
+                <i class="fab fa-whatsapp" style="position:absolute; left:15px; top:15px; color:var(--text-dim);"></i>
+                <input type="tel" id="user-phone" class="input-premium" placeholder="WhatsApp (DDD+Num)">
+            </div>
+            <button class="btn-main" onclick="launchApp()" style="margin-top:10px;">ENTRAR AGORA <i class="fas fa-arrow-right" style="margin-left:5px;"></i></button>
         </div>
     </section>
 
     <section id="screen-main" style="display:none;" class="main-container">
         <div style="padding:25px 20px; display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-weight:800; font-size: 1.1rem;">⚓ Olá, <span id="display-user" style="color:var(--accent-cyan)"></span></span>
-            <div style="background: var(--glass); padding: 8px 12px; border-radius: 12px;"><i class="fas fa-ship" style="color:var(--accent-cyan)"></i></div>
+            <div>
+                <span style="display:block; font-size:0.8rem; color:var(--text-dim);">Bem-vindo a bordo,</span>
+                <span style="font-weight:800; font-size: 1.3rem; color:white;" id="display-user">Visitante</span>
+            </div>
+            <div style="width:40px; height:40px; background: rgba(255,255,255,0.05); border-radius: 12px; display:flex; align-items:center; justify-content:center; border: 1px solid var(--border-light);">
+                <i class="fas fa-anchor" style="color:var(--accent-cyan)"></i>
+            </div>
         </div>
 
         <div style="padding: 0 20px;">
-            <div class="swiper-container mySwiper" style="border-radius: 24px; overflow: hidden; height: 160px; background: var(--card-dark);">
+            <div class="swiper-container mySwiper" style="border-radius: 24px; overflow: hidden; height: 170px; background: #1e293b; box-shadow: 0 10px 20px rgba(0,0,0,0.2);">
                 <div class="swiper-wrapper" id="carousel-campaigns"></div>
                 <div class="swiper-pagination"></div>
             </div>
         </div>
 
-        <div style="background:var(--glass); margin:20px; padding:18px; border-radius:24px; border:1px solid rgba(255,255,255,0.05);">
-            <div style="display:flex; justify-content:space-between; font-size:0.65rem; color:var(--text-dim); font-weight: 800; margin-bottom: 10px;">
-                <span>SEUS PONTOS: <b id="total-likes-count" style="color:var(--accent-cyan)">0</b></span>
-                <span id="percent-label">0%</span>
+        <div class="stats-box">
+            <div style="display:flex; justify-content:space-between; font-size:0.75rem; font-weight: 700; margin-bottom: 5px;">
+                <span style="color:var(--text-dim);">PROGRAMA FIDELIDADE</span>
+                <span style="color:var(--accent-cyan);"><b id="total-likes-count">0</b> pts</span>
             </div>
-            <div style="width:100%; height:8px; background:#000; border-radius:10px;">
-                <div id="thermometer-bar" style="height:100%; width:0%; background:var(--gradient); border-radius:10px; transition: width 1s ease-in-out;"></div>
+            <div class="thermometer-container">
+                <div id="thermometer-bar" class="thermometer-fill"></div>
             </div>
         </div>
 
         <div class="search-wrapper">
             <i class="fas fa-search search-icon"></i>
-            <input type="text" id="main-search" class="search-bar" placeholder="Buscar barco ou cidade..." onkeyup="filterShowcase(this.value)">
+            <input type="text" id="main-search" class="search-bar" placeholder="Para onde você vai hoje?" onkeyup="filterShowcase(this.value)">
             <div id="search-dropdown" class="search-results-dropdown"></div>
         </div>
 
         <div class="btn-open-week" onclick="toggleWeek(true)">
-            <i class="far fa-calendar-alt"></i> VER AGENDA SEMANAL
+            <i class="far fa-calendar-alt"></i> VER AGENDA COMPLETA DA SEMANA
         </div>
 
         <div class="showcase-container">
-            <h3 style="margin: 0 0 15px 0; font-size: 0.8rem; letter-spacing: 1.5px; color: var(--text-dim); font-weight: 800;">EM DESTAQUE</h3>
-            <div class="swiper-container showcaseSwiper">
-                <div class="swiper-wrapper" id="dynamic-showcase-wrapper"></div>
+            <h3 style="margin: 0 0 15px 0; font-size: 0.9rem; letter-spacing: 1px; color: var(--text-white); font-weight: 800;">PRÓXIMAS SAÍDAS</h3>
+            <div class="swiper-container showcaseSwiper" style="padding-bottom: 20px;">
+                <div class="swiper-wrapper" id="dynamic-showcase-wrapper">
+                    <div style="padding: 20px; color: var(--text-dim); font-size: 0.8rem;">Carregando embarcações...</div>
+                </div>
             </div>
         </div>
 
@@ -172,87 +336,133 @@
 
     <div id="boat-modal" class="modal" onclick="closeModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-drag-handle"></div>
             <button class="btn-close-modal" onclick="closeModal()"><i class="fas fa-times"></i></button>
-            <img id="modal-img" style="width:100%; height:220px; object-fit:cover; border-radius:30px 30px 0 0;" loading="lazy">
-            <div style="padding:25px;">
-                <h2 id="modal-name" style="margin:0; color:var(--accent-cyan); font-weight: 800; font-size: 1.4rem;"></h2>
-                <div id="modal-departure-text" style="color: var(--accent-yellow); font-size: 0.8rem; margin: 10px 0; font-weight: 700;"></div>
-                <div id="modal-route" style="font-weight:800; padding:15px; background: rgba(255,255,255,0.03); border-radius: 16px; text-align: center; border: 1px solid var(--glass); color: #fff;"></div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:15px; font-size: 0.85rem;">
-                    <div id="modal-date"></div><div id="modal-time"></div>
-                    <div id="modal-price-p" style="color:var(--accent-green); font-weight: 700;"></div><div id="modal-price-c" style="color:var(--accent-yellow); font-weight: 700;"></div>
+            
+            <div style="position:relative;">
+                <img id="modal-img" style="width:100%; height:240px; object-fit:cover; border-radius:30px 30px 0 0;" loading="lazy">
+                <div style="position:absolute; bottom:0; left:0; width:100%; height:80px; background:linear-gradient(to top, #111827, transparent);"></div>
+            </div>
+
+            <div style="padding:25px; position:relative; top:-20px;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <h2 id="modal-name" style="margin:0; color:white; font-weight: 800; font-size: 1.6rem; text-shadow: 0 0 20px rgba(6,182,212,0.4);"></h2>
+                    <button id="btn-share-post" style="background:rgba(255,255,255,0.1); border:none; color:white; width:44px; height:44px; border-radius:14px;"><i class="fas fa-share-alt"></i></button>
                 </div>
-                <div style="display:flex; gap:10px; margin-top:20px;">
-                    <button id="btn-like" class="btn-main" style="background:var(--accent-green); color:#000; flex:1;">GOSTEI</button>
-                    <button id="btn-dislike" class="btn-main" style="background:#ef4444; flex:1;">NÃO GOSTEI</button>
+                
+                <div id="modal-departure-text" style="color: var(--accent-yellow); font-size: 0.85rem; margin: 8px 0; font-weight: 600;"></div>
+                
+                <div id="modal-route" style="font-weight:700; padding:15px; background: rgba(255,255,255,0.05); border-radius: 16px; text-align: center; border: 1px solid var(--border-light); color: #fff; margin-top:10px;"></div>
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:20px;">
+                    <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:12px; text-align:center;">
+                        <div style="font-size:0.7rem; color:var(--text-dim);">DATA</div>
+                        <div id="modal-date" style="font-weight:700; font-size:0.9rem;"></div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:12px; text-align:center;">
+                        <div style="font-size:0.7rem; color:var(--text-dim);">HORA</div>
+                        <div id="modal-time" style="font-weight:700; font-size:0.9rem;"></div>
+                    </div>
                 </div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
-                    <button id="btn-wa1" class="btn-main" style="background:#25d366; color:#fff; display:flex; align-items:center; justify-content:center; gap:8px;">ZAP 1</button>
-                    <button id="btn-wa2" class="btn-main" style="background:#128c7e; color:#fff; display:flex; align-items:center; justify-content:center; gap:8px;">ZAP 2</button>
+
+                <div style="margin-top:20px; display:flex; gap:15px;">
+                    <div style="flex:1;">
+                        <div style="font-size:0.7rem; color:var(--text-dim); margin-bottom:4px;">PASSAGEM</div>
+                        <div id="modal-price-p" style="color:var(--accent-green); font-weight:800; font-size:1.1rem;"></div>
+                    </div>
+                    <div style="flex:1; text-align:right;">
+                        <div style="font-size:0.7rem; color:var(--text-dim); margin-bottom:4px;">CAMAROTE</div>
+                        <div id="modal-price-c" style="color:var(--accent-yellow); font-weight:800; font-size:1.1rem;"></div>
+                    </div>
                 </div>
-                <button class="btn-main" id="btn-share-post" style="margin-top:10px; background:var(--glass);">COMPARTILHAR</button>
+
+                <div style="display:flex; gap:10px; margin-top:25px;">
+                    <button id="btn-like" class="btn-main" style="background:rgba(16,185,129,0.15); color:var(--accent-green); flex:1; box-shadow:none;"><i class="far fa-thumbs-up"></i> GOSTEI</button>
+                    <button id="btn-dislike" class="btn-main" style="background:rgba(239,68,68,0.15); color:#ef4444; flex:1; box-shadow:none;"><i class="far fa-thumbs-down"></i> NÃO</button>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
+                    <button id="btn-wa1" class="btn-main" style="background:#25d366; display:flex; align-items:center; justify-content:center; gap:8px;"><i class="fab fa-whatsapp"></i> WhatsApp 1</button>
+                    <button id="btn-wa2" class="btn-main" style="background:#128c7e; display:flex; align-items:center; justify-content:center; gap:8px;"><i class="fab fa-whatsapp"></i> WhatsApp 2</button>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="weekModal" class="week-modal">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-            <h3 style="margin:0; font-size: 1.4rem;">Escala Semanal</h3>
-            <div onclick="toggleWeek(false)" style="padding: 10px; opacity: 0.6; cursor: pointer;"><i class="fas fa-times" style="font-size: 1.5rem;"></i></div>
+        <div class="modal-drag-handle"></div>
+        <div style="padding:20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin:0; font-size: 1.2rem;">Escala Semanal</h3>
+                <div onclick="toggleWeek(false)" style="padding: 10px; color: var(--text-dim); cursor: pointer;">Fechar</div>
+            </div>
+            <div id="week-list-container" style="display: flex; flex-direction: column;"></div>
         </div>
-        <div id="week-list-container" style="display: flex; flex-direction: column; gap: 5px;"></div>
     </div>
 
     <section id="screen-day-detail" style="display:none; min-height: 100vh;">
-        <div style="padding:20px; display:flex; align-items:center; gap:15px; position: sticky; top:0; background: var(--bg-dark); z-index:100; border-bottom: 1px solid var(--glass);">
-            <button onclick="navigate('screen-main')" style="background:none; border:none; color:white; font-size:1.2rem; padding: 5px; cursor: pointer;"><i class="fas fa-arrow-left"></i></button>
-            <h2 id="day-title" style="margin:0; text-transform:uppercase; color:var(--accent-cyan); font-size: 1.1rem;"></h2>
+        <div style="padding:20px; display:flex; align-items:center; gap:15px; position: sticky; top:0; background: rgba(2,6,23,0.9); backdrop-filter: blur(10px); z-index:100; border-bottom: 1px solid var(--border-light);">
+            <button onclick="navigate('screen-main')" style="background:none; color:white; font-size:1.2rem;"><i class="fas fa-arrow-left"></i></button>
+            <h2 id="day-title" style="margin:0; text-transform:uppercase; color:var(--accent-cyan); font-size: 1.1rem; letter-spacing: 1px;"></h2>
         </div>
         <div class="feed" id="boat-feed"></div>
     </section>
 
     <section id="screen-register" style="display:none; padding:20px; padding-bottom:100px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
-            <button onclick="navigate('screen-main')" style="background:none; border:none; color:var(--text-dim); font-size: 1.2rem; cursor: pointer;"><i class="fas fa-times"></i></button>
-            <span style="font-weight:800; color:var(--accent-cyan);">NOVA VIAGEM</span>
+            <button onclick="navigate('screen-main')" style="background:rgba(255,255,255,0.1); width:40px; height:40px; border-radius:12px; color:white;"><i class="fas fa-arrow-left"></i></button>
+            <span style="font-weight:800; color:var(--text-white); font-size:1.1rem;">NOVA VIAGEM</span>
+            <div style="width:40px;"></div>
         </div>
 
-        <p style="color:var(--text-dim); font-size:0.8rem; margin-bottom:8px;">1. Escolha a Embarcação:</p>
+        <p style="color:var(--text-dim); font-size:0.8rem; margin-bottom:8px; font-weight:700; text-transform:uppercase;">1. Escolha a Embarcação</p>
         <select id="boat-selector" class="select-boat" onchange="onSelectBoat()">
             <option value="">Carregando...</option>
         </select>
 
-        <div id="selected-boat-preview" style="display:none; margin-bottom:20px; text-align:center;">
-            <img id="preview-db-img" style="width:100%; height:150px; object-fit:cover; border-radius:15px; border:1px solid var(--accent-cyan);">
-            <p id="preview-db-name" style="font-weight:800; color:var(--accent-cyan); margin-top:5px;"></p>
+        <div id="selected-boat-preview" style="display:none; margin-bottom:20px; text-align:center; background:rgba(255,255,255,0.03); padding:15px; border-radius:20px;">
+            <img id="preview-db-img" style="width:100%; height:150px; object-fit:cover; border-radius:15px; border:1px solid var(--border-light);">
+            <p id="preview-db-name" style="font-weight:800; color:var(--text-white); margin-top:10px; font-size:1.1rem;"></p>
         </div>
 
         <div id="new-boat-form" class="new-boat-section">
-            <h4 style="margin:0 0 10px 0; color:var(--accent-yellow); font-size:0.9rem;">Cadastro Rápido de Barco</h4>
+            <h4 style="margin:0 0 15px 0; color:var(--accent-yellow); font-size:0.9rem;">CADASTRO DE NOVO BARCO</h4>
             
             <input type="file" id="new-boat-file" accept="image/*" style="display:none" onchange="processNewBoatImage(this)">
             <div class="upload-trigger" onclick="document.getElementById('new-boat-file').click()">
-                <i class="fas fa-camera"></i>
-                <span id="txt-photo-label">Toque para adicionar foto</span>
-                <img id="new-boat-preview-img" style="width:100%; height:100%; object-fit:cover; border-radius:12px; display:none;">
+                <i class="fas fa-camera" style="font-size:2rem; color:var(--accent-cyan); margin-bottom:10px;"></i>
+                <span id="txt-photo-label" style="font-size:0.8rem;">Toque para adicionar foto</span>
+                <img id="new-boat-preview-img" style="width:100%; height:100%; object-fit:cover; display:none;">
             </div>
 
-            <input type="text" id="new-boat-name" class="input-premium" placeholder="Nome do Barco" style="margin-bottom:10px;">
-            <input type="tel" id="new-boat-tel" class="input-premium" placeholder="WhatsApp do Barco (DDD+Num)">
+            <div class="input-group">
+                <input type="text" id="new-boat-name" class="input-premium" placeholder="Nome da Embarcação">
+            </div>
+            <div class="input-group">
+                <input type="tel" id="new-boat-tel" class="input-premium" placeholder="WhatsApp (Apenas números)">
+            </div>
         </div>
         
-        <p style="color:var(--text-dim); font-size:0.8rem; margin-bottom:8px;">2. Detalhes da Viagem:</p>
-        <input type="text" id="in-departure" class="input-premium" placeholder="Local de Saída (Porto)" style="margin-bottom:10px;">
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-            <input type="text" id="in-origin" class="input-premium" placeholder="Origem">
-            <input type="text" id="in-destiny" class="input-premium" placeholder="Destino">
-            <input type="date" id="in-date" class="input-premium">
-            <input type="time" id="in-time" class="input-premium">
-            <input type="number" id="in-price-p" class="input-premium" placeholder="Passagem R$">
-            <input type="number" id="in-price-c" class="input-premium" placeholder="Camarote R$">
+        <p style="color:var(--text-dim); font-size:0.8rem; margin-bottom:8px; font-weight:700; text-transform:uppercase; margin-top:20px;">2. Detalhes da Viagem</p>
+        
+        <div class="input-group"><input type="text" id="in-departure" class="input-premium" placeholder="Local de Saída (Porto)"></div>
+        
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+            <div class="input-group"><input type="text" id="in-origin" class="input-premium" placeholder="Origem"></div>
+            <div class="input-group"><input type="text" id="in-destiny" class="input-premium" placeholder="Destino"></div>
         </div>
         
-        <button class="btn-main" onclick="publish()" style="margin-top:20px;">PUBLICAR AGORA</button>
+        <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:15px;">
+            <div class="input-group"><input type="date" id="in-date" class="input-premium"></div>
+            <div class="input-group"><input type="time" id="in-time" class="input-premium"></div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+            <div class="input-group"><input type="number" id="in-price-p" class="input-premium" placeholder="Passagem R$"></div>
+            <div class="input-group"><input type="number" id="in-price-c" class="input-premium" placeholder="Camarote R$"></div>
+        </div>
+        
+        <button class="btn-main" onclick="publish()" style="margin-top:20px; font-size:1rem; padding:18px;">PUBLICAR AGORA</button>
     </section>
 
     <script>
@@ -281,7 +491,7 @@
             let searchTimeout = null;
             let boatsDB = {}; 
             let selectedBoatData = null; 
-            let currentNewBoatImg = ""; // Para armazenar a imagem base64 do barco novo
+            let currentNewBoatImg = "";
             const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
 
             window.openCustomAlert = function(msg, title = "Sucesso!") {
@@ -297,7 +507,6 @@
                 if(id === 'screen-main') el.style.display = 'flex';
                 else el.style.display = 'block';
                 window.scrollTo(0,0);
-                
                 if(id === 'screen-register') loadRegisteredBoats();
             }
 
@@ -322,17 +531,13 @@
                 updateStats();
             }
 
-            // --- CARREGA LISTA DE BARCOS + OPÇÃO DE NOVO ---
             window.loadRegisteredBoats = function() {
                 const select = document.getElementById('boat-selector');
                 select.innerHTML = '<option value="">Carregando...</option>';
-                
                 rtdb.ref('barcos_cadastrados').once('value', snapshot => {
                     const data = snapshot.val();
                     select.innerHTML = '<option value="">-- Selecione --</option>';
-                    // OPÇÃO MÁGICA DE CADASTRAR NOVO
-                    select.innerHTML += '<option value="new_entry" style="color:var(--accent-yellow); font-weight:bold;">➕ Cadastrar Novo Barco</option>';
-                    
+                    select.innerHTML += '<option value="new_entry" style="color:var(--accent-yellow);">➕ Cadastrar Novo Barco</option>';
                     if(data) {
                         boatsDB = data;
                         Object.values(data).forEach(b => {
@@ -342,21 +547,16 @@
                 });
             }
 
-            // --- SELEÇÃO INTELIGENTE ---
             window.onSelectBoat = function() {
                 const id = document.getElementById('boat-selector').value;
                 const previewDiv = document.getElementById('selected-boat-preview');
                 const newForm = document.getElementById('new-boat-form');
-                
-                // Se escolheu cadastrar novo
                 if(id === 'new_entry') {
                     selectedBoatData = null;
                     previewDiv.style.display = 'none';
                     newForm.style.display = 'block';
                     return;
                 }
-
-                // Se escolheu existente
                 newForm.style.display = 'none';
                 if(id && boatsDB[id]) {
                     selectedBoatData = boatsDB[id];
@@ -369,7 +569,6 @@
                 }
             }
 
-            // --- PROCESSAR IMAGEM DO NOVO BARCO ---
             window.processNewBoatImage = function(input) {
                 if (input.files && input.files[0]) {
                     const reader = new FileReader();
@@ -384,9 +583,7 @@
                             canvas.height = img.height * scaleSize;
                             const ctx = canvas.getContext('2d');
                             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                            
                             currentNewBoatImg = canvas.toDataURL('image/jpeg', 0.6); 
-                            
                             document.getElementById('new-boat-preview-img').src = currentNewBoatImg;
                             document.getElementById('new-boat-preview-img').style.display = 'block';
                             document.getElementById('txt-photo-label').style.display = 'none';
@@ -396,34 +593,21 @@
                 }
             }
 
-            // --- PUBLICAR (Lógica Dupla) ---
             window.publish = function() {
                 const selectVal = document.getElementById('boat-selector').value;
                 const dateI = document.getElementById('in-date').value;
-                if(!selectVal) return openCustomAlert("Escolha um barco ou cadastre um novo!", "Erro");
+                if(!selectVal) return openCustomAlert("Escolha um barco ou cadastre!", "Erro");
                 if(!dateI) return openCustomAlert("Informe a data!", "Erro");
 
                 firebase.auth().signInAnonymously().then(() => {
-                    
-                    // CASO 1: CADASTRANDO UM BARCO NOVO
                     if(selectVal === 'new_entry') {
                         const newName = document.getElementById('new-boat-name').value;
                         const newTel = document.getElementById('new-boat-tel').value;
-                        
-                        if(!newName || !newTel || !currentNewBoatImg) return openCustomAlert("Preencha Nome, Foto e Zap do novo barco!", "Erro");
-
-                        // Salva na lista global primeiro
+                        if(!newName || !newTel || !currentNewBoatImg) return openCustomAlert("Preencha dados do novo barco!", "Erro");
                         const newId = Date.now();
                         const newBoatObj = { id: newId, name: newName, tel1: newTel, img: currentNewBoatImg };
-                        
-                        rtdb.ref('barcos_cadastrados/' + newId).set(newBoatObj).then(() => {
-                            // Agora publica a viagem
-                            saveTrip(newBoatObj, dateI);
-                        });
-
-                    } 
-                    // CASO 2: BARCO EXISTENTE
-                    else {
+                        rtdb.ref('barcos_cadastrados/' + newId).set(newBoatObj).then(() => { saveTrip(newBoatObj, dateI); });
+                    } else {
                         if(!selectedBoatData) return openCustomAlert("Erro na seleção");
                         saveTrip(selectedBoatData, dateI);
                     }
@@ -432,51 +616,39 @@
 
             function saveTrip(boatData, dateVal) {
                 const tripData = {
-                    boatId: boatData.id,
-                    name: boatData.name,
-                    img: boatData.img,
-                    tel1: boatData.tel1,
-                    tel2: boatData.tel2 || "",
-                    
+                    boatId: boatData.id, name: boatData.name, img: boatData.img,
+                    tel1: boatData.tel1, tel2: boatData.tel2 || "",
                     departure: document.getElementById('in-departure').value,
                     origin: document.getElementById('in-origin').value,
                     destiny: document.getElementById('in-destiny').value,
-                    date: dateVal,
-                    time: document.getElementById('in-time').value,
+                    date: dateVal, time: document.getElementById('in-time').value,
                     price_p: document.getElementById('in-price-p').value,
                     price_c: document.getElementById('in-price-c').value,
-                    
-                    likes: 0,
-                    dislikes: 0,
-                    registeredBy: currentUser.phone
+                    likes: 0, dislikes: 0, registeredBy: currentUser.phone
                 };
-
                 const partesData = dateVal.split('-');
                 const dataObj = new Date(partesData[0], partesData[1] - 1, partesData[2]);
                 const dN = diasSemana[dataObj.getDay()];
-
                 rtdb.ref('barcos/' + dN).push(tripData).then(() => {
-                    openCustomAlert("Viagem publicada com sucesso!");
+                    openCustomAlert("Viagem publicada!");
                     navigate('screen-main');
-                    // Reset
+                    // Resets
                     document.getElementById('boat-selector').value = "";
                     document.getElementById('selected-boat-preview').style.display = 'none';
                     document.getElementById('new-boat-form').style.display = 'none';
-                    selectedBoatData = null;
-                    currentNewBoatImg = "";
+                    selectedBoatData = null; currentNewBoatImg = "";
                     document.getElementById('new-boat-preview-img').style.display = 'none';
                     document.getElementById('txt-photo-label').style.display = 'block';
                 });
             }
 
-            // --- LÓGICAS PADRÃO (FEED, CARROSSEL, ETC) ---
             function listenDynamicShowcase() {
                 rtdb.ref('barcos').on('value', snapshot => {
                     const wrapper = document.getElementById('dynamic-showcase-wrapper');
                     wrapper.innerHTML = "";
                     allBoatsLocal = [];
                     const allDays = snapshot.val();
-                    if(!allDays) { wrapper.innerHTML = '<div style="padding:20px">Nada por aqui.</div>'; return; }
+                    if(!allDays) { wrapper.innerHTML = '<div style="padding:20px; color:gray">Nenhuma viagem encontrada.</div>'; return; }
                     const fragment = document.createDocumentFragment();
                     Object.keys(allDays).forEach(dayName => {
                         Object.keys(allDays[dayName]).forEach(boatId => {
@@ -484,8 +656,17 @@
                             allBoatsLocal.push(b);
                             const slide = document.createElement('div');
                             slide.className = 'swiper-slide boat-slide-item';
-                            slide.style.width = '195px';
-                            slide.innerHTML = `<div class="boat-card" onclick="openDirectDetails('${dayName}', '${boatId}')"><div class="day-tag-float">${dayName}</div><div class="boat-img-container" style="height: 135px;"><img src="${b.img}" class="boat-img" loading="lazy"><div class="boat-overlay-name">${b.name}</div></div><div class="route-box">${b.origin} > ${b.destiny}</div></div>`;
+                            slide.style.width = '200px';
+                            slide.innerHTML = `
+                                <div class="boat-card" onclick="openDirectDetails('${dayName}', '${boatId}')">
+                                    <div class="day-tag-float">${dayName}</div>
+                                    <div class="price-tag-float">R$ ${b.price_p}</div>
+                                    <div class="boat-img-container" style="height: 140px;">
+                                        <img src="${b.img}" class="boat-img" loading="lazy">
+                                        <div class="boat-overlay-name">${b.name}</div>
+                                    </div>
+                                    <div class="route-box">${b.origin} <i class="fas fa-arrow-right" style="color:var(--accent-cyan)"></i> ${b.destiny}</div>
+                                </div>`;
                             fragment.appendChild(slide);
                         });
                     });
@@ -514,18 +695,23 @@
             window.openDirectDetails = function(day, key) { currentDayPage = day; openDetails(key); }
             window.toggleWeek = function(show) { const modal = document.getElementById('weekModal'); if(show) { modal.style.display = 'block'; setTimeout(() => modal.classList.add('active'), 10); } else { modal.classList.remove('active'); setTimeout(() => modal.style.display = 'none', 300); } }
             window.closeModal = function() { document.getElementById('boat-modal').style.display = 'none'; }
-            window.renderWeekList = function() { document.getElementById('week-list-container').innerHTML = diasSemana.map(d => `<div class="day-row" onclick="changePage('${d}'); toggleWeek(false)"><span>${d}</span><i class="fas fa-chevron-right" style="color:var(--accent-cyan)"></i></div>`).join(''); }
+            window.renderWeekList = function() { document.getElementById('week-list-container').innerHTML = diasSemana.map(d => `<div class="day-row" onclick="changePage('${d}'); toggleWeek(false)"><span>${d}</span><i class="fas fa-chevron-right"></i></div>`).join(''); }
             window.changePage = function(day) { currentDayPage = day; document.getElementById('day-title').innerText = day; navigate('screen-day-detail'); loadFeed(); }
 
             window.loadFeed = function() {
                 const feed = document.getElementById('boat-feed');
-                feed.innerHTML = "<div style='color:#fff; padding:20px'>Carregando...</div>";
+                feed.innerHTML = "<div style='color:white; padding:20px'>Carregando...</div>";
                 rtdb.ref('barcos/' + currentDayPage).once('value', s => { 
                     feed.innerHTML = "";
                     const data = s.val();
                     if(data) Object.keys(data).forEach(key => {
                         const b = data[key];
-                        feed.innerHTML += `<div class="boat-card" onclick="openDetails('${key}')"><div style="position:absolute; top:8px; left:8px; background:var(--accent-green); color:#000; font-size:0.6rem; padding:3px 8px; border-radius:8px; font-weight:800; z-index:10;">R$ ${b.price_p}</div><div class="boat-img-container"><img src="${b.img}" class="boat-img" loading="lazy"><div class="boat-overlay-name">${b.name}</div></div><div class="route-box"><span>${b.origin}</span><i class="fas fa-arrow-right" style="color:var(--accent-cyan)"></i><span>${b.destiny}</span></div></div>`;
+                        feed.innerHTML += `
+                            <div class="boat-card" onclick="openDetails('${key}')">
+                                <div class="day-tag-float" style="background:var(--accent-green); color:black;">R$ ${b.price_p}</div>
+                                <div class="boat-img-container"><img src="${b.img}" class="boat-img" loading="lazy"><div class="boat-overlay-name">${b.name}</div></div>
+                                <div class="route-box"><span>${b.origin}</span><i class="fas fa-arrow-right" style="color:var(--accent-cyan)"></i><span>${b.destiny}</span></div>
+                            </div>`;
                     });
                     else feed.innerHTML = "<p style='padding:20px; color:gray'>Nenhuma viagem neste dia.</p>";
                 });
@@ -537,12 +723,13 @@
                     if(!b) return;
                     document.getElementById('modal-img').src = b.img;
                     document.getElementById('modal-name').innerText = b.name;
-                    document.getElementById('modal-departure-text').innerHTML = `<i class="fas fa-anchor"></i> SAÍDA: ${b.departure || "Não informado"}`;
-                    document.getElementById('modal-route').innerHTML = `${b.origin} <i class="fas fa-arrow-right"></i> ${b.destiny}`;
-                    document.getElementById('modal-date').innerText = "📅 Data: " + formatDateBR(b.date);
-                    document.getElementById('modal-time').innerText = "⏰ Hora: " + b.time;
-                    document.getElementById('modal-price-p').innerText = "🎟 Passagem: R$ " + b.price_p;
-                    document.getElementById('modal-price-c').innerText = "🛌 Camarote: R$ " + b.price_c;
+                    document.getElementById('modal-departure-text').innerHTML = `<i class="fas fa-map-marker-alt"></i> SAÍDA: ${b.departure || "Porto Principal"}`;
+                    document.getElementById('modal-route').innerHTML = `${b.origin} <i class="fas fa-long-arrow-alt-right"></i> ${b.destiny}`;
+                    document.getElementById('modal-date').innerText = formatDateBR(b.date);
+                    document.getElementById('modal-time').innerText = b.time;
+                    document.getElementById('modal-price-p').innerText = "R$ " + b.price_p;
+                    document.getElementById('modal-price-c').innerText = "R$ " + b.price_c;
+                    
                     document.getElementById('btn-share-post').onclick = () => shareBoat(b);
                     document.getElementById('btn-like').onclick = () => registerVote(key, 'likes');
                     document.getElementById('btn-dislike').onclick = () => registerVote(key, 'dislikes');
@@ -554,7 +741,7 @@
 
             window.shareBoat = function(b) {
                 const dataF = formatDateBR(b.date);
-                const texto = window.encodeURIComponent(`🚢 *BARCOAPP*\n*${b.name}*\n${b.origin} ➔ ${b.destiny}\n📅 ${dataF} - ${b.time}\n💰 R$ ${b.price_p}`);
+                const texto = window.encodeURIComponent(`🚢 *BARCOAPP - VIAGEM*\n\n⚓ *${b.name}*\n📍 ${b.origin} ➔ ${b.destiny}\n📅 ${dataF} às ${b.time}\n💰 Passagem: R$ ${b.price_p}\n\n📲 _Veja mais no App!_`);
                 window.open(`https://wa.me/?text=${texto}`, '_blank');
             }
 
@@ -564,7 +751,7 @@
                     if (snap.exists()) return openCustomAlert("Você já avaliou!");
                     voteLockRef.set({ voto: type }).then(() => {
                         rtdb.ref(`barcos/${currentDayPage}/${boatKey}/${type}`).transaction(v => (v || 0) + 1);
-                        openCustomAlert("Obrigado!"); closeModal();
+                        openCustomAlert("Voto registrado!"); closeModal();
                     });
                 });
             }
@@ -601,7 +788,8 @@
             }
 
             window.formatDateBR = function(dateStr) { if(!dateStr) return ""; const parts = dateStr.split('-'); return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : dateStr; }
-            window.shareApp = function() { window.open("https://wa.me/?text=🚢 BarcoApp: " + window.location.href); }
+            window.shareApp = function() { window.open("https://wa.me/?text=🚢 Baixe o BarcoApp e veja os horários de saída! " + window.location.href); }
+            
             if(currentUser) startApp();
         });
     </script>
