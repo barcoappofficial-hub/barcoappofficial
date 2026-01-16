@@ -2,361 +2,467 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Admin | BarcoApp Control</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Master Admin | Gestão Completa</title>
+
+    <meta name="theme-color" content="#020617">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icone.png">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js" defer></script>
 
     <style>
         :root {
-            --primary: #22d3ee;
-            --primary-glow: rgba(34, 211, 238, 0.3);
-            --bg-dark: #020617;
-            --bg-card: #0f172a;
-            --text-main: #f1f5f9;
-            --text-dim: #94a3b8;
-            --danger: #f43f5e;
-            --success: #10b981;
-            --warning: #fbbf24;
-            --border: rgba(255, 255, 255, 0.08);
-            --sidebar-width: 260px;
+            --primary: #22d3ee; --primary-glow: rgba(34, 211, 238, 0.3);
+            --bg-dark: #020617; --bg-card: #0f172a; --text-main: #f1f5f9; --text-dim: #94a3b8;
+            --danger: #f43f5e; --success: #10b981; --warning: #fbbf24;
+            --border: rgba(255, 255, 255, 0.08); --sidebar-width: 260px;
         }
 
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: var(--bg-dark); 
-            color: var(--text-main); 
-            margin: 0; 
-            display: flex; 
-            min-height: 100vh;
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); color: var(--text-main); margin: 0; display: flex; min-height: 100vh; overflow-x: hidden; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        /* TELA DE LOGIN */
-        #login-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-dark); z-index: 9999;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .login-card {
-            background: var(--bg-card); padding: 40px; border-radius: 30px;
-            border: 1px solid var(--border); width: 100%; max-width: 350px; text-align: center;
-        }
+        /* LOGIN */
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-card { background: var(--bg-card); padding: 40px; border-radius: 30px; border: 1px solid var(--border); width: 100%; max-width: 350px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
 
-        /* Sidebar */
-        .sidebar { 
-            width: var(--sidebar-width); 
-            background: #010409; 
-            height: 100vh; 
-            position: fixed; 
-            border-right: 1px solid var(--border); 
-            padding: 30px 20px;
-            display: none; /* Inicia escondida */
-            flex-direction: column;
-        }
-
-        .sidebar h1 { 
-            color: var(--primary); 
-            font-size: 1.4rem; 
-            font-weight: 800;
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            margin-bottom: 50px; 
-        }
-
-        .nav-item { 
-            display: flex; align-items: center; gap: 12px; padding: 14px 15px; 
-            color: var(--text-dim); text-decoration: none; border-radius: 12px; 
-            margin-bottom: 8px; transition: 0.2s; font-weight: 500; font-size: 0.9rem;
-        }
-
+        /* SIDEBAR & NAV */
+        .mobile-toggle { display: none; position: fixed; top: 15px; left: 15px; z-index: 1001; background: var(--bg-card); border: 1px solid var(--border); color: white; padding: 10px; border-radius: 8px; cursor: pointer; }
+        
+        .sidebar { width: var(--sidebar-width); background: #010409; height: 100vh; position: fixed; border-right: 1px solid var(--border); padding: 30px 20px; display: none; flex-direction: column; z-index: 1000; transition: transform 0.3s ease; }
+        .sidebar.active { transform: translateX(0); }
+        .sidebar h1 { color: var(--primary); font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; gap: 12px; margin-bottom: 40px; margin-top: 10px; }
+        
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 14px 15px; color: var(--text-dim); text-decoration: none; border-radius: 12px; margin-bottom: 8px; transition: 0.2s; font-weight: 600; font-size: 0.9rem; cursor: pointer; }
         .nav-item:hover, .nav-item.active { background: rgba(34, 211, 238, 0.08); color: var(--primary); }
 
-        .main { margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); padding: 40px; display: none; }
+        /* MAIN CONTENT */
+        .main { margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); padding: 40px; display: none; transition: margin 0.3s; }
+        
+        /* CARDS & PANELS */
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: var(--bg-card); padding: 24px; border-radius: 20px; border: 1px solid var(--border); }
+        .stat-card h2 { margin: 8px 0 0; font-size: 2rem; font-weight: 800; }
 
-        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 40px; }
-        .stat-card { background: var(--bg-card); padding: 24px; border-radius: 20px; border: 1px solid var(--border); position: relative; }
-        .stat-card small { color: var(--text-dim); text-transform: uppercase; font-size: 0.7rem; font-weight: 800; }
-        .stat-card h2 { margin: 8px 0 0; font-size: 2.2rem; font-weight: 800; }
-
-        .dashboard-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 30px; }
+        .dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 30px; }
+        @media (min-width: 1024px) { .dashboard-grid { grid-template-columns: 2fr 1fr; } }
 
         .panel { background: var(--bg-card); border-radius: 24px; border: 1px solid var(--border); margin-bottom: 30px; overflow: hidden; }
-        .panel-header { padding: 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01); }
-        .panel-header h3 { margin: 0; font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 12px; }
+        .panel-header { padding: 20px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01); }
+        .panel-body { padding: 0; }
+        .p-content { padding: 20px; }
 
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 15px 12px; color: var(--text-dim); font-size: 0.65rem; text-transform: uppercase; border-bottom: 1px solid var(--border); }
-        td { padding: 16px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.85rem; }
+        /* TABELA */
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 500px; }
+        th { text-align: left; padding: 15px 20px; color: var(--text-dim); font-size: 0.7rem; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+        td { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.85rem; vertical-align: middle; }
 
-        input { width: 100%; background: #020617; border: 1px solid var(--border); padding: 14px; border-radius: 12px; color: white; margin-bottom: 12px; outline: none; box-sizing: border-box; }
+        /* FORMULARIOS */
+        input, select { width: 100%; background: #020617; border: 1px solid var(--border); padding: 14px; border-radius: 12px; color: white; margin-bottom: 12px; outline: none; }
         
         .btn { padding: 12px 20px; border-radius: 12px; border: none; cursor: pointer; font-weight: 700; transition: 0.3s; font-size: 0.85rem; }
-        .btn-add { background: var(--primary); color: #000; width: 100%; text-transform: uppercase; }
-        .btn-del { background: rgba(244, 63, 94, 0.1); color: var(--danger); padding: 8px 12px; }
-        .btn-wa { background: #10b981; color: white; padding: 8px 12px; margin-right: 5px; }
+        .btn-primary { background: var(--primary); color: #000; width: 100%; }
+        .btn-danger { background: rgba(244, 63, 94, 0.15); color: var(--danger); }
+        .btn-icon { width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 8px; border: none; cursor: pointer; }
 
-        .rank-row { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: #020617; border-radius: 14px; margin-bottom: 10px; border: 1px solid var(--border); }
-        .img-preview { width: 60px; height: 35px; border-radius: 6px; object-fit: cover; background: #000; border: 1px solid var(--border); }
-        .tag-dia { background: var(--primary-glow); color: var(--primary); padding: 4px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; }
-        
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        /* UPLOAD PREVIEW */
+        .upload-area { width: 100%; height: 150px; border: 2px dashed var(--border); border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 15px; position: relative; overflow: hidden; }
+        .upload-area:hover { border-color: var(--primary); background: rgba(34, 211, 238, 0.05); }
+        .preview-img { width: 100%; height: 100%; object-fit: cover; position: absolute; top:0; left:0; display: none; }
+
+        /* RESPONSIVIDADE */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); width: 280px; display: flex; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+            .sidebar.active { transform: translateX(0); }
+            .main { margin-left: 0; width: 100%; padding: 20px; padding-top: 60px; }
+            .mobile-toggle { display: block; }
+        }
+
+        /* CUSTOM ALERT */
+        #custom-alert { display: none; position: fixed; bottom: 20px; right: 20px; background: var(--success); color: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 10000; font-weight: 700; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body>
 
+    <div id="custom-alert"><i class="fas fa-check-circle"></i> <span id="alert-msg">Ação realizada!</span></div>
+
     <div id="login-overlay">
         <div class="login-card">
-            <i class="fas fa-ship" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;"></i>
-            <h2 style="margin-bottom: 25px;">Acesso Restrito</h2>
-            <input type="text" id="admin-user" placeholder="Usuário">
-            <input type="password" id="admin-pass" placeholder="Senha">
-            <button class="btn btn-add" onclick="handleLogin()">Entrar no Painel</button>
+            <i class="fas fa-user-shield" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;"></i>
+            <h2 style="margin-bottom: 10px;">Master Admin</h2>
+            <p style="color:var(--text-dim); margin-bottom: 25px; font-size: 0.9rem;">Painel de Controle BarcoApp</p>
+            <input type="password" id="admin-pass" placeholder="Senha de Acesso">
+            <button class="btn btn-primary" onclick="handleLogin()">ENTRAR</button>
         </div>
     </div>
 
+    <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+
     <div class="sidebar" id="sidebar">
-        <h1><i class="fas fa-ship"></i> BARCOAPP</h1>
-        <a href="#" class="nav-item active"><i class="fas fa-th-large"></i> Dashboard</a>
-        <a href="#boats-section" class="nav-item"><i class="fas fa-anchor"></i> Escalas</a>
-        <a href="#users-section" class="nav-item"><i class="fas fa-users"></i> Usuários</a>
-        <a href="#carousel-section" class="nav-item"><i class="fas fa-image"></i> Carrossel</a>
+        <h1><i class="fas fa-ship"></i> ADMIN<span style="color:white">PANEL</span></h1>
+        <div class="nav-item active" onclick="showSection('dashboard', this)"><i class="fas fa-chart-pie"></i> Visão Geral</div>
+        <div class="nav-item" onclick="showSection('fleet', this)"><i class="fas fa-ship"></i> Frota Base (Outros)</div>
+        <div class="nav-item" onclick="showSection('trips', this)"><i class="fas fa-calendar-alt"></i> Viagens Ativas</div>
+        <div class="nav-item" onclick="showSection('users', this)"><i class="fas fa-users"></i> Usuários</div>
+        <div class="nav-item" onclick="showSection('config', this)"><i class="fas fa-cog"></i> Configurações</div>
+        <div style="margin-top: auto;">
+            <div class="nav-item" style="color: var(--danger);" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</div>
+        </div>
     </div>
 
     <div class="main" id="main-content">
-        <div class="stats-row">
-            <div class="stat-card"><small>Total Usuários</small><h2 id="total-users">0</h2></div>
-            <div class="stat-card"><small>Barcos Ativos</small><h2 id="total-boats">0</h2></div>
-            <div class="stat-card"><small>Saldo Global</small><h2 id="total-likes">0</h2></div>
-            <div class="stat-card"><small>Status</small><h2 style="color: var(--success); font-size: 1.5rem;">ONLINE</h2></div>
+        
+        <div id="sec-dashboard">
+            <div class="stats-row">
+                <div class="stat-card"><small style="color:var(--primary)">Usuários</small><h2 id="st-users">0</h2></div>
+                <div class="stat-card"><small style="color:var(--success)">Barcos Cadastrados</small><h2 id="st-fleet">0</h2></div>
+                <div class="stat-card"><small style="color:var(--warning)">Viagens Hoje</small><h2 id="st-trips">0</h2></div>
+                <div class="stat-card"><small>Saldo Likes</small><h2 id="st-likes">0</h2></div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-header"><h3><i class="fas fa-trophy" style="color:var(--warning)"></i> Top Ranking de Popularidade</h3></div>
+                <div class="panel-body p-content" id="ranking-list">Carregando...</div>
+            </div>
         </div>
 
-        <div class="dashboard-grid">
-            <div class="left-side">
-                <div class="panel" id="users-section">
-                    <div class="panel-header"><h3><i class="fas fa-users"></i> Usuários Cadastrados</h3></div>
-                    <div class="panel-body">
-                        <table>
-                            <thead><tr><th>Nome</th><th>WhatsApp</th><th>Likes</th><th>Ações</th></tr></thead>
-                            <tbody id="users-list"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="panel" id="boats-section">
-                    <div class="panel-header"><h3><i class="fas fa-calendar-day"></i> Escalas Ativas</h3></div>
-                    <div class="panel-body">
-                        <table>
-                            <thead><tr><th>Embarcação</th><th>Dia</th><th>Votos</th><th>Gestão</th></tr></thead>
-                            <tbody id="boats-list"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="right-side">
-                <div class="panel" id="carousel-section" style="border-color: var(--primary);">
-                    <div class="panel-header"><h3><i class="fas fa-images"></i> Banners do Carrossel</h3></div>
-                    <div class="panel-body" style="padding: 20px;">
-                        <div id="carousel-manager" style="max-height: 250px; overflow-y: auto; margin-bottom: 20px;"></div>
-                        <small style="color:var(--primary); font-weight: 800;">NOVO BANNER (URL)</small>
-                        <input type="text" id="car-img" placeholder="URL da Imagem (JPEG/PNG)">
-                        <input type="text" id="car-link" placeholder="Link de destino (opcional)">
-                        <button class="btn btn-add" onclick="saveCarousel()">Publicar no App</button>
-                    </div>
-                </div>
-
-                <div class="panel">
-                    <div class="panel-header"><h3><i class="fas fa-broadcast-tower"></i> Alerta Global</h3></div>
-                    <div class="panel-body" style="padding: 20px;">
-                        <input type="text" id="alert-msg" placeholder="Mensagem para todos os usuários...">
-                        <div style="display: flex; gap: 10px;">
-                            <button class="btn" style="background: var(--warning); color: #000; flex: 2; font-weight: 800;" onclick="pushAlert()">ATIVAR</button>
-                            <button class="btn" style="background: var(--danger); color: #fff; flex: 1; font-weight: 800;" onclick="removeAlert()">DESATIVAR</button>
+        <div id="sec-fleet" style="display:none;">
+            <div class="dashboard-grid">
+                <div>
+                    <div class="panel">
+                        <div class="panel-header"><h3><i class="fas fa-plus-circle"></i> Cadastrar Nova Embarcação</h3></div>
+                        <div class="panel-body p-content">
+                            <p style="color:var(--text-dim); font-size:0.85rem; margin-bottom:15px;">Adicione aqui barcos novos ("Outros") para que apareçam na lista do usuário.</p>
+                            
+                            <div class="upload-area" onclick="document.getElementById('fleet-file').click()">
+                                <i class="fas fa-camera" style="font-size: 2rem; color: var(--text-dim); margin-bottom: 10px;"></i>
+                                <span style="font-size: 0.8rem; color: var(--text-dim);">Toque para adicionar foto</span>
+                                <img id="fleet-preview" class="preview-img">
+                            </div>
+                            <input type="file" id="fleet-file" accept="image/*" style="display:none" onchange="processFleetImage(this)">
+                            
+                            <input type="text" id="fleet-name" placeholder="Nome da Embarcação">
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <input type="tel" id="fleet-tel1" placeholder="WhatsApp 1 (DDD+Num)">
+                                <input type="tel" id="fleet-tel2" placeholder="WhatsApp 2 (Opcional)">
+                            </div>
+                            <button class="btn btn-primary" onclick="saveFleetBoat()">CADASTRAR BARCO</button>
                         </div>
                     </div>
                 </div>
-
-                <div class="panel">
-                    <div class="panel-header"><h3><i class="fas fa-trophy"></i> Ranking de Popularidade</h3></div>
-                    <div class="panel-body" id="ranking-list" style="padding: 20px;"></div>
+                <div>
+                    <div class="panel">
+                        <div class="panel-header"><h3>Frota Cadastrada</h3></div>
+                        <div class="panel-body p-content" id="fleet-list" style="max-height: 500px; overflow-y: auto;">
+                            </div>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <div id="sec-trips" style="display:none;">
+            <div class="panel">
+                <div class="panel-header"><h3><i class="fas fa-anchor"></i> Escalas Publicadas pelos Usuários</h3></div>
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr><th>Barco</th><th>Dia</th><th>Rota</th><th>Likes</th><th>Ação</th></tr></thead>
+                        <tbody id="trips-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="sec-users" style="display:none;">
+            <div class="panel">
+                <div class="panel-header"><h3><i class="fas fa-users"></i> Usuários do App</h3></div>
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr><th>Nome</th><th>WhatsApp</th><th>Status</th><th>Ação</th></tr></thead>
+                        <tbody id="users-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="sec-config" style="display:none;">
+            <div class="panel">
+                <div class="panel-header"><h3>Alerta Global (Aviso no App)</h3></div>
+                <div class="panel-body p-content">
+                    <input type="text" id="alert-text-config" placeholder="Ex: Manutenção no porto amanhã...">
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn" style="background:var(--success); color:white; flex:1" onclick="setGlobalAlert(true)">ATIVAR</button>
+                        <button class="btn" style="background:var(--danger); color:white; flex:1" onclick="setGlobalAlert(false)">DESATIVAR</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header"><h3>Carrossel de Banners</h3></div>
+                <div class="panel-body p-content">
+                    <input type="text" id="banner-url" placeholder="URL da Imagem do Banner">
+                    <button class="btn btn-primary" onclick="addBanner()">ADICIONAR BANNER</button>
+                    <div id="banner-list" style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px;"></div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCSqpD1irHfgXpzAytoRn_VNwImNzuGouE",
-            authDomain: "barcoapp01.firebaseapp.com",
-            databaseURL: "https://barcoapp01-default-rtdb.firebaseio.com",
-            projectId: "barcoapp01",
-            storageBucket: "barcoapp01.firebasestorage.app",
-            messagingSenderId: "715122174520",
-            appId: "1:715122174520:web:da4ae91a6862c129d714cd"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+        document.addEventListener('DOMContentLoaded', function() {
+            // CONFIG FIREBASE
+            const firebaseConfig = {
+                apiKey: "AIzaSyCSqpD1irHfgXpzAytoRn_VNwImNzuGouE",
+                authDomain: "barcoapp01.firebaseapp.com",
+                databaseURL: "https://barcoapp01-default-rtdb.firebaseio.com",
+                projectId: "barcoapp01",
+                storageBucket: "barcoapp01.firebasestorage.app",
+                messagingSenderId: "715122174520",
+                appId: "1:715122174520:web:da4ae91a6862c129d714cd"
+            };
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.database();
+            
+            let fleetImgBase64 = "";
 
-        // Lógica de Login
-        function handleLogin() {
-            const u = document.getElementById('admin-user').value;
-            const p = document.getElementById('admin-pass').value;
-
-            // Altere aqui seu usuário e senha
-            if(u === "admin" && p === "barco77") {
-                document.getElementById('login-overlay').style.display = 'none';
-                document.getElementById('sidebar').style.display = 'flex';
-                document.getElementById('main-content').style.display = 'block';
-                
-                // IMPORTANTE: Logar no Firebase para permitir escrita
-                firebase.auth().signInAnonymously().then(() => {
-                    startApp();
-                });
-            } else {
-                alert("Acesso negado!");
+            // --- NAVEGAÇÃO ---
+            window.toggleSidebar = function() {
+                document.getElementById('sidebar').classList.toggle('active');
             }
-        }
 
-        function startApp() {
-            db.ref().on('value', snapshot => {
-                const data = snapshot.val();
-                if(!data) return;
+            window.showSection = function(id, btn) {
+                document.querySelectorAll('.main > div').forEach(d => d.style.display = 'none');
+                document.getElementById('sec-' + id).style.display = 'block';
                 
-                if(data.config && data.config.alerta && data.config.alerta.active) {
-                    document.getElementById('alert-msg').value = data.config.alerta.text;
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                btn.classList.add('active');
+                
+                if(window.innerWidth <= 768) toggleSidebar(); // Fecha menu no mobile
+            }
+
+            window.handleLogin = function() {
+                const p = document.getElementById('admin-pass').value;
+                if(p === "barco77") { // SENHA SIMPLES
+                    document.getElementById('login-overlay').style.display = 'none';
+                    document.getElementById('sidebar').style.display = 'flex';
+                    document.getElementById('main-content').style.display = 'block';
+                    firebase.auth().signInAnonymously();
+                    initDashboard();
+                } else {
+                    alert("Senha incorreta");
+                }
+            }
+            
+            window.logout = function() { location.reload(); }
+
+            window.showToast = function(msg) {
+                const t = document.getElementById('custom-alert');
+                document.getElementById('alert-msg').innerText = msg;
+                t.style.display = 'block';
+                setTimeout(() => t.style.display = 'none', 3000);
+            }
+
+            function initDashboard() {
+                db.ref().on('value', snap => {
+                    const data = snap.val();
+                    if(!data) return;
+
+                    updateStats(data);
+                    renderFleet(data.barcos_cadastrados);
+                    renderTrips(data.barcos);
+                    renderUsers(data.usuarios_cadastrados, data.barcos);
+                    renderConfig(data.config);
+                });
+            }
+
+            // --- ESTATISTICAS ---
+            function updateStats(data) {
+                const users = data.usuarios_cadastrados ? Object.keys(data.usuarios_cadastrados).length : 0;
+                const fleet = data.barcos_cadastrados ? Object.keys(data.barcos_cadastrados).length : 0;
+                
+                let trips = 0;
+                let totalLikes = 0;
+                
+                if(data.barcos) {
+                    Object.values(data.barcos).forEach(day => {
+                        Object.values(day).forEach(t => {
+                            trips++;
+                            totalLikes += (t.likes || 0) - (t.dislikes || 0);
+                        });
+                    });
                 }
 
-                const userStats = calculateUserStats(data.barcos, data.usuarios_cadastrados);
-                renderUsers(data.usuarios_cadastrados, userStats);
-                renderBoats(data.barcos);
-                renderCarousel(data.config ? data.config.carrossel : null);
-                renderRanking(userStats);
-            });
-        }
+                document.getElementById('st-users').innerText = users;
+                document.getElementById('st-fleet').innerText = fleet;
+                document.getElementById('st-trips').innerText = trips;
+                document.getElementById('st-likes').innerText = totalLikes;
+            }
 
-        function calculateUserStats(barcos, usuarios) {
-            let stats = {};
-            for(let id in usuarios) { stats[id] = { nome: usuarios[id].nome, saldo: 0 }; }
-            if(barcos) {
-                for(let dia in barcos) {
-                    for(let key in barcos[dia]) {
-                        const b = barcos[dia][key];
-                        if(b.registeredBy && stats[b.registeredBy]) {
-                            const saldoBarco = (b.likes || 0) - (b.dislikes || 0);
-                            stats[b.registeredBy].saldo += saldoBarco;
+            // --- GESTÃO DE FROTA (ADD NEW BOAT) ---
+            window.processFleetImage = function(input) {
+                if (input.files && input.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = new Image();
+                        img.src = e.target.result;
+                        img.onload = function() {
+                            const canvas = document.createElement('canvas');
+                            const scale = 500 / img.width;
+                            canvas.width = 500;
+                            canvas.height = img.height * scale;
+                            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                            fleetImgBase64 = canvas.toDataURL('image/jpeg', 0.6);
+                            
+                            const preview = document.getElementById('fleet-preview');
+                            preview.src = fleetImgBase64;
+                            preview.style.display = 'block';
                         }
                     }
+                    reader.readAsDataURL(input.files[0]);
                 }
             }
-            return stats;
-        }
 
-        function renderUsers(users, stats) {
-            const list = document.getElementById('users-list');
-            list.innerHTML = ""; let count = 0;
-            for(let id in users) {
-                count++;
-                const saldo = stats[id] ? stats[id].saldo : 0;
-                list.innerHTML += `<tr>
-                    <td><b>${users[id].nome}</b></td>
-                    <td>${users[id].whatsapp}</td>
-                    <td><span style="color:${saldo >= 0 ? 'var(--primary)' : 'var(--danger)'}">${saldo}</span></td>
-                    <td>
-                        <button class="btn btn-wa" onclick="window.open('https://wa.me/55${users[id].whatsapp}')"><i class="fab fa-whatsapp"></i></button>
-                        <button class="btn btn-del" onclick="deleteUser('${id}')"><i class="fas fa-user-slash"></i></button>
-                    </td>
-                </tr>`;
+            window.saveFleetBoat = function() {
+                const name = document.getElementById('fleet-name').value;
+                const t1 = document.getElementById('fleet-tel1').value;
+                const t2 = document.getElementById('fleet-tel2').value;
+
+                if(!name || !t1 || !fleetImgBase64) return alert("Preencha Nome, Telefone 1 e Foto");
+
+                const id = Date.now();
+                db.ref('barcos_cadastrados/' + id).set({
+                    id: id, name: name, tel1: t1, tel2: t2, img: fleetImgBase64
+                }).then(() => {
+                    showToast("Barco Cadastrado!");
+                    // Limpar form
+                    document.getElementById('fleet-name').value = "";
+                    document.getElementById('fleet-preview').style.display = 'none';
+                    fleetImgBase64 = "";
+                });
             }
-            document.getElementById('total-users').innerText = count;
-        }
 
-        function renderBoats(barcos) {
-            const list = document.getElementById('boats-list');
-            list.innerHTML = ""; let bCount = 0; let totalSaldoGlobal = 0;
-            if(barcos) {
-                for(let dia in barcos) {
-                    for(let key in barcos[dia]) {
-                        const b = barcos[dia][key];
-                        bCount++; 
-                        const saldo = (b.likes || 0) - (b.dislikes || 0);
-                        totalSaldoGlobal += saldo;
-                        list.innerHTML += `<tr>
-                            <td>${b.name}</td>
-                            <td><span class="tag-dia">${dia}</span></td>
-                            <td><span style="color:var(--success)">+${b.likes || 0}</span> / <span style="color:var(--danger)">-${b.dislikes || 0}</span></td>
-                            <td><button class="btn btn-del" onclick="deleteBoat('${dia}','${key}')">Excluir</button></td>
+            window.deleteFleet = function(id) {
+                if(confirm("Apagar este barco da base?")) db.ref('barcos_cadastrados/' + id).remove();
+            }
+
+            function renderFleet(fleet) {
+                const list = document.getElementById('fleet-list');
+                list.innerHTML = "";
+                if(fleet) {
+                    Object.values(fleet).forEach(b => {
+                        list.innerHTML += `
+                        <div style="display:flex; align-items:center; gap:10px; padding:10px; background:rgba(255,255,255,0.03); margin-bottom:8px; border-radius:10px;">
+                            <img src="${b.img}" style="width:40px; height:40px; border-radius:8px; object-fit:cover;">
+                            <div style="flex:1;">
+                                <div style="font-weight:700; font-size:0.9rem;">${b.name}</div>
+                                <div style="font-size:0.7rem; color:var(--text-dim);">${b.tel1}</div>
+                            </div>
+                            <button class="btn-icon btn-danger" onclick="deleteFleet('${b.id}')"><i class="fas fa-trash"></i></button>
+                        </div>`;
+                    });
+                }
+            }
+
+            // --- VIAGENS E RANKING ---
+            window.deleteTrip = function(day, key) { if(confirm("Apagar viagem?")) db.ref(`barcos/${day}/${key}`).remove(); }
+
+            function renderTrips(barcos) {
+                const list = document.getElementById('trips-list');
+                list.innerHTML = "";
+                if(barcos) {
+                    Object.keys(barcos).forEach(day => {
+                        Object.entries(barcos[day]).forEach(([k, t]) => {
+                            list.innerHTML += `
+                            <tr>
+                                <td><div style="display:flex; align-items:center; gap:8px;"><img src="${t.img}" style="width:30px; height:30px; border-radius:50%; object-fit:cover"> ${t.name}</div></td>
+                                <td>${day}</td>
+                                <td>${t.origin} > ${t.destiny}</td>
+                                <td><span style="color:var(--success)">+${t.likes||0}</span></td>
+                                <td><button class="btn-icon btn-danger" onclick="deleteTrip('${day}','${k}')"><i class="fas fa-trash"></i></button></td>
+                            </tr>`;
+                        });
+                    });
+                }
+            }
+
+            // --- USUÁRIOS E RANKING ---
+            window.deleteUser = function(uid) { if(confirm("Banir usuário?")) db.ref(`usuarios_cadastrados/${uid}`).remove(); }
+
+            function renderUsers(users, barcos) {
+                const list = document.getElementById('users-list');
+                const rankList = document.getElementById('ranking-list');
+                list.innerHTML = "";
+                
+                let userScores = [];
+
+                if(users) {
+                    Object.entries(users).forEach(([uid, u]) => {
+                        // Calcula pontos
+                        let points = 0;
+                        if(barcos) {
+                            Object.values(barcos).forEach(day => {
+                                Object.values(day).forEach(t => {
+                                    if(t.registeredBy === u.whatsapp) points += ((t.likes||0) - (t.dislikes||0));
+                                });
+                            });
+                        }
+                        userScores.push({name: u.nome, points: points});
+
+                        list.innerHTML += `
+                        <tr>
+                            <td><b>${u.nome}</b></td>
+                            <td>${u.whatsapp}</td>
+                            <td><span style="color:${points>=0?'var(--primary)':'var(--danger)'}">${points} Pts</span></td>
+                            <td><button class="btn-icon btn-danger" onclick="deleteUser('${uid}')"><i class="fas fa-user-slash"></i></button></td>
                         </tr>`;
-                    }
+                    });
+
+                    // Render Ranking
+                    userScores.sort((a,b) => b.points - a.points);
+                    rankList.innerHTML = userScores.slice(0, 5).map((u, i) => `
+                        <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid var(--border)">
+                            <span>${i+1}º ${u.name}</span>
+                            <span style="font-weight:800; color:var(--primary)">${u.points}</span>
+                        </div>
+                    `).join('');
                 }
             }
-            document.getElementById('total-boats').innerText = bCount;
-            document.getElementById('total-likes').innerText = totalSaldoGlobal;
-        }
 
-        function renderCarousel(slides) {
-            const container = document.getElementById('carousel-manager');
-            container.innerHTML = "";
-            if(!slides) return;
-            Object.keys(slides).forEach(key => {
-                const s = slides[key];
-                container.innerHTML += `
-                    <div class="rank-row">
-                        <img src="${s.img}" class="img-preview" onerror="this.src='https://via.placeholder.com/60x35'">
-                        <div style="flex:1; margin-left:10px; overflow:hidden">
-                            <div style="font-size:0.6rem; color:var(--text-dim); white-space:nowrap; text-overflow:ellipsis;">${s.link || 'Sem link'}</div>
-                        </div>
-                        <button class="btn btn-del" onclick="deleteSlide('${key}')"><i class="fas fa-times"></i></button>
-                    </div>`;
-            });
-        }
+            // --- CONFIGS ---
+            window.setGlobalAlert = function(active) {
+                const txt = document.getElementById('alert-text-config').value;
+                db.ref('config/alerta').set({text: txt, active: active}).then(()=> showToast(active ? "Alerta Ativado" : "Alerta Removido"));
+            }
 
-        function saveCarousel() {
-            const img = document.getElementById('car-img').value;
-            const link = document.getElementById('car-link').value;
-            if(!img) return alert("Insira a URL da imagem!");
-            db.ref('config/carrossel').push({ img, link }).then(() => {
-                document.getElementById('car-img').value = "";
-                document.getElementById('car-link').value = "";
-                alert("Banner adicionado!");
-            }).catch(e => alert("Erro: " + e.message));
-        }
+            window.addBanner = function() {
+                const url = document.getElementById('banner-url').value;
+                if(url) db.ref('config/carrossel').push({img: url}).then(()=> {
+                    document.getElementById('banner-url').value=""; showToast("Banner Add");
+                });
+            }
 
-        function deleteSlide(key) { if(confirm("Remover este banner?")) db.ref(`config/carrossel/${key}`).remove(); }
+            window.delBanner = function(k) { if(confirm("Apagar banner?")) db.ref(`config/carrossel/${k}`).remove(); }
 
-        function pushAlert() {
-            const text = document.getElementById('alert-msg').value;
-            if(!text) return alert("Digite o texto!");
-            db.ref('config/alerta').set({ text, active: true }).then(() => alert("Alerta ativado!"));
-        }
-
-        function removeAlert() {
-            db.ref('config/alerta').set({ text: "", active: false }).then(() => {
-                document.getElementById('alert-msg').value = "";
-                alert("Alerta removido!");
-            });
-        }
-
-        function renderRanking(stats) {
-            const div = document.getElementById('ranking-list');
-            let arr = Object.values(stats);
-            arr.sort((a,b) => b.saldo - a.saldo);
-            div.innerHTML = arr.slice(0,5).map((u, i) => `
-                <div class="rank-row">
-                    <span>${i+1}º ${u.nome}</span>
-                    <span class="tag-dia">${u.saldo} PTS</span>
-                </div>`).join('');
-        }
-
-        function deleteUser(uid) { if(confirm("Banir usuário?")) db.ref(`usuarios_cadastrados/${uid}`).remove(); }
-        function deleteBoat(dia, key) { if(confirm("Excluir escala?")) db.ref(`barcos/${dia}/${key}`).remove(); }
-
+            function renderConfig(cfg) {
+                if(cfg && cfg.alerta) document.getElementById('alert-text-config').value = cfg.alerta.text;
+                const blist = document.getElementById('banner-list');
+                blist.innerHTML = "";
+                if(cfg && cfg.carrossel) {
+                    Object.entries(cfg.carrossel).forEach(([k, v]) => {
+                        blist.innerHTML += `<div style="position:relative"><img src="${v.img}" style="width:100%; border-radius:8px;"><button onclick="delBanner('${k}')" style="position:absolute; top:2px; right:2px; background:red; color:white; border:none; border-radius:4px;">X</button></div>`;
+                    });
+                }
+            }
+        });
     </script>
 </body>
 </html>
