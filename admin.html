@@ -18,7 +18,7 @@
 
     <style>
         :root {
-            --primary: #22d3ee;
+            --primary: #22d3ee; --primary-glow: rgba(34, 211, 238, 0.3);
             --bg-dark: #020617; --bg-card: #0f172a; --text-main: #f1f5f9; --text-dim: #94a3b8;
             --danger: #f43f5e; --success: #10b981; --warning: #fbbf24;
             --border: rgba(255, 255, 255, 0.08); --sidebar-width: 260px;
@@ -27,11 +27,11 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); color: var(--text-main); margin: 0; display: flex; min-height: 100vh; overflow-x: hidden; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
 
-        /* LOGIN */
+        /* Login Overlay */
         #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .login-card { background: var(--bg-card); padding: 40px; border-radius: 30px; border: 1px solid var(--border); width: 100%; max-width: 350px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
 
-        /* SIDEBAR */
+        /* Navigation */
         .mobile-toggle { display: none; position: fixed; top: 15px; left: 15px; z-index: 1001; background: var(--bg-card); border: 1px solid var(--border); color: white; padding: 10px; border-radius: 8px; cursor: pointer; }
         .sidebar { width: var(--sidebar-width); background: #010409; height: 100vh; position: fixed; border-right: 1px solid var(--border); padding: 30px 20px; display: none; flex-direction: column; z-index: 1000; transition: transform 0.3s ease; }
         .sidebar.active { transform: translateX(0); }
@@ -39,10 +39,10 @@
         .nav-item { display: flex; align-items: center; gap: 12px; padding: 14px 15px; color: var(--text-dim); text-decoration: none; border-radius: 12px; margin-bottom: 8px; transition: 0.2s; font-weight: 600; font-size: 0.9rem; cursor: pointer; }
         .nav-item:hover, .nav-item.active { background: rgba(34, 211, 238, 0.08); color: var(--primary); }
 
-        /* MAIN CONTENT */
+        /* Main Area */
         .main { margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); padding: 40px; display: none; transition: margin 0.3s; }
         
-        /* UI ELEMENTS */
+        /* Stats & Panels */
         .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .stat-card { background: var(--bg-card); padding: 24px; border-radius: 20px; border: 1px solid var(--border); }
         .stat-card h2 { margin: 8px 0 0; font-size: 2rem; font-weight: 800; }
@@ -55,20 +55,27 @@
         .panel-header h3 { margin: 0; font-size: 1rem; color: var(--text-main); }
         .p-content { padding: 20px; }
 
+        /* Tables & Lists */
         .table-responsive { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; min-width: 500px; }
         th { text-align: left; padding: 15px 20px; color: var(--text-dim); font-size: 0.7rem; text-transform: uppercase; border-bottom: 1px solid var(--border); }
         td { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.85rem; vertical-align: middle; }
 
+        /* Inputs & Buttons */
         input, select { width: 100%; background: #020617; border: 1px solid var(--border); padding: 14px; border-radius: 12px; color: white; margin-bottom: 12px; outline: none; }
-        
         .btn { padding: 12px 20px; border-radius: 12px; border: none; cursor: pointer; font-weight: 700; transition: 0.3s; font-size: 0.85rem; }
         .btn-primary { background: var(--primary); color: #000; width: 100%; }
         .btn-danger { background: rgba(244, 63, 94, 0.15); color: var(--danger); }
         .btn-icon { width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 8px; border: none; cursor: pointer; }
 
+        /* Upload */
         .upload-area { width: 100%; height: 150px; border: 2px dashed var(--border); border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 15px; position: relative; overflow: hidden; }
         .preview-img { width: 100%; height: 100%; object-fit: cover; position: absolute; top:0; left:0; display: none; }
+
+        /* Alerts & Badge */
+        #custom-alert { display: none; position: fixed; bottom: 20px; right: 20px; background: var(--success); color: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 10000; font-weight: 700; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .badge { background: var(--danger); color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; margin-left: 5px; }
 
         @media (max-width: 768px) {
             .sidebar { transform: translateX(-100%); width: 280px; display: flex; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
@@ -77,11 +84,6 @@
             .mobile-toggle { display: block; }
             .dashboard-grid { grid-template-columns: 1fr; }
         }
-
-        #custom-alert { display: none; position: fixed; bottom: 20px; right: 20px; background: var(--success); color: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 10000; font-weight: 700; animation: slideIn 0.3s ease; }
-        @keyframes slideIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
-        .badge { background: var(--danger); color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; margin-left: 5px; }
     </style>
 </head>
 <body>
@@ -98,11 +100,10 @@
     </div>
 
     <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-
     <div class="sidebar" id="sidebar">
         <h1><i class="fas fa-ship"></i> ADMIN<span style="color:white">PANEL</span></h1>
         <div class="nav-item active" onclick="showSection('dashboard', this)"><i class="fas fa-chart-pie"></i> Visão Geral</div>
-        <div class="nav-item" onclick="showSection('fleet', this)"><i class="fas fa-ship"></i> Frota Base (Outros)</div>
+        <div class="nav-item" onclick="showSection('fleet', this)"><i class="fas fa-ship"></i> Frota Base</div>
         <div class="nav-item" onclick="showSection('trips', this)"><i class="fas fa-calendar-alt"></i> Viagens Ativas</div>
         <div class="nav-item" onclick="showSection('reports', this)" style="color: var(--danger);"><i class="fas fa-exclamation-triangle"></i> Denúncias <span id="badge-reports" class="badge" style="display:none">0</span></div>
         <div class="nav-item" onclick="showSection('users', this)"><i class="fas fa-users"></i> Usuários</div>
@@ -117,10 +118,10 @@
                 <div class="stat-card"><small style="color:var(--primary)">Usuários</small><h2 id="st-users">0</h2></div>
                 <div class="stat-card"><small style="color:var(--success)">Barcos Cadastrados</small><h2 id="st-fleet">0</h2></div>
                 <div class="stat-card"><small style="color:var(--warning)">Viagens Hoje</small><h2 id="st-trips">0</h2></div>
-                <div class="stat-card" style="border-color:var(--danger)"><small style="color:var(--danger)">Denúncias Pendentes</small><h2 id="st-reports">0</h2></div>
+                <div class="stat-card" style="border-color:var(--danger)"><small style="color:var(--danger)">Denúncias</small><h2 id="st-reports">0</h2></div>
             </div>
             <div class="panel">
-                <div class="panel-header"><h3><i class="fas fa-trophy" style="color:var(--warning)"></i> Top Ranking de Popularidade</h3></div>
+                <div class="panel-header"><h3><i class="fas fa-trophy" style="color:var(--warning)"></i> Ranking de Usuários</h3></div>
                 <div class="panel-body p-content" id="ranking-list">Carregando...</div>
             </div>
         </div>
@@ -128,10 +129,8 @@
         <div id="sec-fleet" style="display:none;">
             <div class="dashboard-grid">
                 <div class="panel">
-                    <div class="panel-header"><h3><i class="fas fa-plus-circle"></i> Novo Barco (Base de Dados)</h3></div>
+                    <div class="panel-header"><h3><i class="fas fa-plus-circle"></i> Novo Barco (Base)</h3></div>
                     <div class="panel-body p-content">
-                        <p style="color:var(--text-dim); font-size:0.85rem; margin-bottom:15px;">Cadastre barcos fixos para aparecerem na lista do usuário.</p>
-                        
                         <div class="upload-area" onclick="document.getElementById('fleet-file').click()">
                             <i class="fas fa-camera" style="font-size: 2rem; color: var(--text-dim); margin-bottom: 10px;"></i>
                             <span style="font-size: 0.8rem; color: var(--text-dim);">Toque para foto</span>
@@ -147,13 +146,10 @@
                         <button class="btn btn-primary" onclick="saveFleetBoat()">SALVAR BARCO</button>
                     </div>
                 </div>
-
                 <div class="panel">
                     <div class="panel-header"><h3>Frota Atual</h3></div>
-                    <div class="panel-body p-content" style="flex: 1; min-height: 400px; display:flex; flex-direction:column;">
-                        <div id="fleet-list" style="flex:1; overflow-y: auto;">
-                            <div style="text-align:center; color:gray; padding:20px;">Carregando frota...</div>
-                        </div>
+                    <div class="panel-body p-content" style="flex: 1;">
+                        <div id="fleet-list" style="max-height: 600px; overflow-y: auto;">Carregando...</div>
                     </div>
                 </div>
             </div>
@@ -190,8 +186,8 @@
             <div class="panel">
                 <div class="panel-header"><h3>Alerta Global</h3></div>
                 <div class="panel-body p-content">
-                    <input type="text" id="alert-text-config" placeholder="Mensagem de alerta...">
-                    <div style="display:flex; gap:10px;"><button class="btn" style="background:var(--success); color:white; flex:1" onclick="setGlobalAlert(true)">ATIVAR</button><button class="btn" style="background:var(--danger); color:white; flex:1" onclick="setGlobalAlert(false)">DESATIVAR</button></div>
+                    <input type="text" id="alert-text-config" placeholder="Mensagem...">
+                    <div style="display:flex; gap:10px;"><button class="btn" style="background:var(--success); color:white; flex:1" onclick="setGlobalAlert(true)">LIGAR</button><button class="btn" style="background:var(--danger); color:white; flex:1" onclick="setGlobalAlert(false)">DESLIGAR</button></div>
                 </div>
             </div>
             <div class="panel">
@@ -218,11 +214,7 @@
                 messagingSenderId: "715122174520",
                 appId: "1:715122174520:web:da4ae91a6862c129d714cd"
             };
-            
-            // Inicializa apenas se não existir
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-            }
+            if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
             const db = firebase.database();
             
             let fleetImgBase64 = "";
@@ -241,7 +233,7 @@
                     document.getElementById('login-overlay').style.display = 'none';
                     document.getElementById('sidebar').style.display = 'flex';
                     document.getElementById('main-content').style.display = 'block';
-                    firebase.auth().signInAnonymously().catch(err => alert("Erro Auth: " + err.message));
+                    firebase.auth().signInAnonymously().catch(err => console.error("Auth Error:", err));
                     initDashboard();
                 } else alert("Senha errada");
             }
@@ -252,18 +244,14 @@
                 t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000);
             }
 
+            // FUNÇÃO PRINCIPAL DE LEITURA
             function initDashboard() {
                 db.ref().on('value', snap => {
-                    const data = snap.val();
-                    
-                    // Se não tiver dados, limpa tudo
-                    if(!data) { 
-                        renderFleet(null); 
-                        return; 
-                    }
-                    
+                    const data = snap.val() || {};
+                    console.log("DADOS RECEBIDOS:", data); // Debug no Console
+
                     updateStats(data);
-                    renderFleet(data.barcos_cadastrados); // Chama renderFleet explicitamente
+                    renderFleet(data.barcos_cadastrados);
                     renderTrips(data.barcos);
                     renderUsers(data.usuarios_cadastrados, data.barcos);
                     renderReports(data.denuncias);
@@ -283,12 +271,126 @@
                 document.getElementById('st-trips').innerText = trips;
                 document.getElementById('st-likes').innerText = likes;
                 document.getElementById('st-reports').innerText = reports;
+                
                 const badge = document.getElementById('badge-reports');
                 badge.style.display = reports > 0 ? 'inline-block' : 'none';
                 badge.innerText = reports;
             }
 
-            // FROTA - CORREÇÃO DE RENDERIZAÇÃO
+            // --- RENDERIZADORES BLINDADOS ---
+
+            // 1. Renderizar Frota (Correção Principal)
+            function renderFleet(fleet) {
+                const list = document.getElementById('fleet-list');
+                list.innerHTML = ""; // Limpa
+                
+                if(!fleet) {
+                    list.innerHTML = "<div style='text-align:center; padding:30px; color:#64748b;'>Nenhum barco na base.</div>";
+                    return;
+                }
+
+                Object.values(fleet).forEach(b => {
+                    // Proteção contra dados quebrados
+                    const img = b.img || 'icone.png';
+                    const name = b.name || 'Sem Nome';
+                    const tel = b.tel1 || 'Sem contato';
+
+                    list.innerHTML += `
+                    <div style="display:flex; align-items:center; gap:12px; padding:12px; background:rgba(255,255,255,0.03); margin-bottom:8px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
+                        <img src="${img}" style="width:50px; height:50px; border-radius:10px; object-fit:cover; background:#000;">
+                        <div style="flex:1;">
+                            <div style="font-weight:700; color:#f1f5f9;">${name}</div>
+                            <div style="font-size:0.8rem; color:#94a3b8;">${tel}</div>
+                        </div>
+                        <button class="btn-icon" style="background:rgba(244,63,94,0.2); color:#f43f5e;" onclick="deleteFleet('${b.id}')"><i class="fas fa-trash"></i></button>
+                    </div>`;
+                });
+            }
+
+            // 2. Renderizar Usuários (Com verificação de nulidade)
+            function renderUsers(u, b) {
+                const l = document.getElementById('users-list'); 
+                const rl = document.getElementById('ranking-list'); 
+                l.innerHTML=""; 
+                rl.innerHTML="";
+
+                if(!u) {
+                    l.innerHTML = "<tr><td colspan='4' style='text-align:center; color:gray'>Sem usuários.</td></tr>";
+                    rl.innerHTML = "Sem dados.";
+                    return;
+                }
+
+                let sc = [];
+                Object.entries(u).forEach(([k,v]) => {
+                    let pts = 0;
+                    // Calcula pontos com segurança (verifica se 'b' existe)
+                    if(b) Object.values(b).forEach(d => {
+                        if(d) Object.values(d).forEach(t => { 
+                            if(t.registeredBy === v.whatsapp) pts += ((t.likes||0) - (t.dislikes||0)); 
+                        });
+                    });
+                    
+                    sc.push({n:v.nome, p:pts});
+                    l.innerHTML += `<tr><td><b>${v.nome}</b></td><td>${v.whatsapp}</td><td><span style="color:${pts>=0?'var(--primary)':'var(--danger)'}">${pts} Pts</span></td><td><button class="btn-icon" style="background:rgba(244,63,94,0.2); color:#f43f5e;" onclick="deleteUser('${k}')"><i class="fas fa-user-slash"></i></button></td></tr>`;
+                });
+
+                sc.sort((x,y)=>y.p-x.p);
+                rl.innerHTML = sc.slice(0,5).map((x,i)=>`<div style="display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid #ffffff10"><span>${i+1}. ${x.n}</span><span style="color:#22d3ee; font-weight:800">${x.p}</span></div>`).join('');
+            }
+
+            // 3. Renderizar Viagens
+            function renderTrips(b) {
+                const l = document.getElementById('trips-list'); 
+                l.innerHTML="";
+                
+                if(!b) {
+                    l.innerHTML = "<tr><td colspan='5' style='text-align:center; color:gray'>Nenhuma viagem ativa.</td></tr>";
+                    return;
+                }
+
+                Object.keys(b).forEach(day => {
+                    if(b[day]) {
+                        Object.entries(b[day]).forEach(([k, t]) => {
+                            l.innerHTML += `<tr>
+                                <td><div style="display:flex; align-items:center; gap:8px;"><img src="${t.img}" style="width:30px; height:30px; border-radius:50%; object-fit:cover"> ${t.name}</div></td>
+                                <td>${day}</td>
+                                <td>${t.origin} > ${t.destiny}</td>
+                                <td><span style="color:var(--success)">+${t.likes||0}</span></td>
+                                <td><button class="btn-icon" style="background:rgba(244,63,94,0.2); color:#f43f5e;" onclick="deleteTrip('${day}','${k}')"><i class="fas fa-trash"></i></button></td>
+                            </tr>`;
+                        });
+                    }
+                });
+            }
+
+            // 4. Renderizar Denuncias
+            function renderReports(r) {
+                const l = document.getElementById('reports-list'); 
+                l.innerHTML="";
+                
+                if(!r) {
+                    l.innerHTML = "<tr><td colspan='4' style='text-align:center; color:gray'>Sem denúncias pendentes.</td></tr>";
+                    return;
+                }
+
+                Object.entries(r).forEach(([k,v]) => {
+                    l.innerHTML += `<tr>
+                        <td><b style="color:var(--primary)">${v.boatName || 'Desconhecido'}</b></td>
+                        <td>${v.reason}</td>
+                        <td>${v.reportedBy}</td>
+                        <td><button class="btn btn-primary" style="padding:5px 10px; font-size:0.7rem;" onclick="resolveReport('${k}')">RESOLVER</button></td>
+                    </tr>`;
+                });
+            }
+
+            // 5. Configurações
+            function renderConfig(c) {
+                if(c && c.alerta) document.getElementById('alert-text-config').value = c.alerta.text;
+                const bl = document.getElementById('banner-list'); bl.innerHTML="";
+                if(c && c.carrossel) Object.entries(c.carrossel).forEach(([k,v]) => bl.innerHTML+=`<div class="banner-item"><img src="${v.img}" style="width:100%"><button onclick="delBanner('${k}')" style="position:absolute;top:2px;right:2px;background:red;color:white;border:none">X</button></div>`);
+            }
+
+            // --- AÇÕES DO ADMIN ---
             window.processFleetImage = function(input) {
                 if (input.files && input.files[0]) {
                     const r = new FileReader();
@@ -310,10 +412,10 @@
                 const n = document.getElementById('fleet-name').value;
                 const t1 = document.getElementById('fleet-tel1').value;
                 const t2 = document.getElementById('fleet-tel2').value;
-                if(!n || !t1 || !fleetImgBase64) return alert("Preencha dados e foto");
+                if(!n || !t1 || !fleetImgBase64) return alert("Preencha todos os dados");
                 const id = Date.now();
                 db.ref('barcos_cadastrados/'+id).set({id:id, name:n, tel1:t1, tel2:t2, img:fleetImgBase64}).then(()=>{
-                    showToast("Salvo!");
+                    showToast("Barco Salvo!");
                     document.getElementById('fleet-name').value="";
                     document.getElementById('fleet-preview').style.display='none';
                     fleetImgBase64="";
@@ -321,78 +423,16 @@
             }
 
             window.deleteFleet = function(id) { if(confirm("Apagar?")) db.ref('barcos_cadastrados/'+id).remove(); }
-
-            // RENDER FLEET BLINDADO
-            function renderFleet(fleet) {
-                console.log("Renderizando frota:", fleet); // Para debug
-                const list = document.getElementById('fleet-list');
-                
-                if (!fleet || Object.keys(fleet).length === 0) {
-                    list.innerHTML = "<div style='text-align:center; padding:30px; color:#64748b;'>Nenhum barco cadastrado.</div>";
-                    return;
-                }
-
-                let htmlContent = "";
-                Object.values(fleet).forEach(b => {
-                    const img = b.img || 'icone.png'; // Fallback
-                    const name = b.name || 'Sem Nome';
-                    const tel = b.tel1 || 'Sem Tel';
-                    
-                    htmlContent += `
-                    <div style="display:flex; align-items:center; gap:12px; padding:12px; background:rgba(255,255,255,0.03); margin-bottom:8px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
-                        <img src="${img}" style="width:50px; height:50px; border-radius:10px; object-fit:cover; background:#000;">
-                        <div style="flex:1;">
-                            <div style="font-weight:700; color:#f1f5f9;">${name}</div>
-                            <div style="font-size:0.8rem; color:#94a3b8;">${tel}</div>
-                        </div>
-                        <button class="btn-icon" style="background:rgba(244,63,94,0.2); color:#f43f5e;" onclick="deleteFleet('${b.id}')"><i class="fas fa-trash"></i></button>
-                    </div>`;
-                });
-                
-                list.innerHTML = htmlContent;
-            }
-
-            // OUTROS RENDERIZADORES
-            window.resolveReport = function(k) { if(confirm("Apagar denúncia?")) db.ref('denuncias/'+k).remove(); }
-            function renderReports(r) {
-                const l = document.getElementById('reports-list'); l.innerHTML="";
-                if(r) Object.entries(r).forEach(([k,v]) => l.innerHTML+=`<tr><td>${v.boatName}</td><td>${v.reason}</td><td>${v.reportedBy}</td><td><button class="btn btn-primary" onclick="resolveReport('${k}')">OK</button></td></tr>`);
-                else l.innerHTML="<tr><td colspan='4' style='text-align:center;color:gray'>Sem denúncias</td></tr>";
-            }
-
             window.deleteTrip = function(d,k) { if(confirm("Apagar?")) db.ref(`barcos/${d}/${k}`).remove(); }
-            function renderTrips(b) {
-                const l = document.getElementById('trips-list'); l.innerHTML="";
-                if(b) Object.keys(b).forEach(d => Object.entries(b[d]).forEach(([k,v]) => l.innerHTML+=`<tr><td>${v.name}</td><td>${d}</td><td>${v.origin}>${v.destiny}</td><td>${v.likes||0}</td><td><button class="btn-icon btn-danger" onclick="deleteTrip('${d}','${k}')"><i class="fas fa-trash"></i></button></td></tr>`));
-            }
-
             window.deleteUser = function(u) { if(confirm("Banir?")) db.ref('usuarios_cadastrados/'+u).remove(); }
-            function renderUsers(u, b) {
-                const l = document.getElementById('users-list'); const rl = document.getElementById('ranking-list'); l.innerHTML="";
-                let sc = [];
-                if(u) {
-                    Object.entries(u).forEach(([k,v]) => {
-                        let pts = 0;
-                        if(b) Object.values(b).forEach(d => Object.values(d).forEach(t => { if(t.registeredBy===v.whatsapp) pts+=(t.likes||0); }));
-                        sc.push({n:v.nome, p:pts});
-                        l.innerHTML+=`<tr><td>${v.nome}</td><td>${v.whatsapp}</td><td>${pts}</td><td><button class="btn-icon btn-danger" onclick="deleteUser('${k}')"><i class="fas fa-trash"></i></button></td></tr>`;
-                    });
-                    sc.sort((x,y)=>y.p-x.p);
-                    rl.innerHTML = sc.slice(0,5).map((x,i)=>`<div style="display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid #ffffff10"><span>${i+1}. ${x.n}</span><span style="color:#22d3ee">${x.p}</span></div>`).join('');
-                }
-            }
-
-            window.setGlobalAlert = function(a) { db.ref('config/alerta').set({text:document.getElementById('alert-text-config').value, active:a}).then(()=>showToast("Alerta Atualizado")); }
+            window.resolveReport = function(k) { if(confirm("Resolver?")) db.ref('denuncias/'+k).remove(); }
+            
+            window.setGlobalAlert = function(a) { db.ref('config/alerta').set({text:document.getElementById('alert-text-config').value, active:a}).then(()=>showToast("Atualizado")); }
             window.addBanner = function() { 
                 const u=document.getElementById('banner-url').value, l=document.getElementById('banner-link').value;
-                if(u) db.ref('config/carrossel').push({img:u, link:l}).then(()=>showToast("Banner Add"));
+                if(u) db.ref('config/carrossel').push({img:u, link:l}).then(()=>showToast("Banner OK"));
             }
             window.delBanner = function(k) { if(confirm("Apagar?")) db.ref('config/carrossel/'+k).remove(); }
-            function renderConfig(c) {
-                if(c && c.alerta) document.getElementById('alert-text-config').value = c.alerta.text;
-                const bl = document.getElementById('banner-list'); bl.innerHTML="";
-                if(c && c.carrossel) Object.entries(c.carrossel).forEach(([k,v]) => bl.innerHTML+=`<div class="banner-item"><img src="${v.img}" style="width:100%"><button onclick="delBanner('${k}')" style="position:absolute;top:2px;right:2px;background:red;color:white;border:none">X</button></div>`);
-            }
         });
     </script>
 </body>
