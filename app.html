@@ -6,7 +6,8 @@
     <title>BarcoApp | Premium</title>
 
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#020617">
+    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="logo.png">
@@ -19,65 +20,135 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
 
     <style>
         :root {
-            --bg-dark: #0f172a; --card-glass: rgba(30, 41, 59, 0.7);
-            --primary: #06b6d4; --secondary: #3b82f6; --accent: #f59e0b;
-            --success: #10b981; --danger: #ef4444; --text-main: #f8fafc;
-            --text-dim: #94a3b8; --border: rgba(255, 255, 255, 0.1);
+            --bg-dark: #020617;
+            --card-glass: rgba(30, 41, 59, 0.7);
+            --primary: #06b6d4; /* Cyan */
+            --secondary: #3b82f6; /* Blue */
+            --accent: #f59e0b; /* Orange/Yellow (Estrelas) */
+            --success: #10b981;
+            --danger: #ef4444;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
             --gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
         }
+
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body, html { margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-dark); color: var(--text-main); height: 100%; overflow-x: hidden; }
-        body::before { content: ''; position: fixed; top: -100px; right: -100px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(6,182,212,0.15) 0%, transparent 70%); z-index: -1; pointer-events: none; }
+        
+        body, html { 
+            margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: var(--bg-dark); color: var(--text-main); 
+            height: 100%; overflow-x: hidden; 
+        }
+
+        /* Background Visual */
+        body::before {
+            content: ''; position: fixed; top: -100px; right: -100px; 
+            width: 300px; height: 300px; background: radial-gradient(circle, rgba(6,182,212,0.15) 0%, transparent 70%);
+            z-index: -1; pointer-events: none;
+        }
 
         /* Estrutura */
         .main-container { display: flex; flex-direction: column; min-height: 100vh; padding-bottom: 100px; }
         
         /* Botões */
-        .btn-main { width: 100%; padding: 16px; border: none; border-radius: 16px; background: var(--gradient); color: white; font-weight: 700; font-size: 1rem; box-shadow: 0 4px 15px rgba(6, 182, 212, 0.25); cursor: pointer; transition: transform 0.2s; }
+        .btn-main {
+            width: 100%; padding: 16px; border: none; border-radius: 16px;
+            background: var(--gradient); color: white; font-weight: 700; font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.25); cursor: pointer;
+            transition: transform 0.2s;
+        }
         .btn-main:active { transform: scale(0.97); opacity: 0.9; }
-        .btn-open-week { background: var(--card-glass); border: 1px solid var(--border); margin: 15px 20px; padding: 16px; border-radius: 18px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 700; color: var(--text-main); cursor: pointer; backdrop-filter: blur(10px); }
 
-        /* Inputs */
-        .input-premium, .select-boat { width: 100%; padding: 16px; border-radius: 14px; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border); color: white; font-size: 0.95rem; margin-bottom: 12px; transition: 0.3s; }
+        .btn-open-week {
+            background: var(--card-glass); border: 1px solid var(--border);
+            margin: 15px 20px; padding: 16px; border-radius: 18px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            font-weight: 700; color: var(--text-main); cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Inputs Modernos */
+        .input-premium, .select-boat {
+            width: 100%; padding: 16px; border-radius: 14px;
+            background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border);
+            color: white; font-size: 0.95rem; margin-bottom: 12px;
+            transition: 0.3s;
+        }
         .input-premium:focus, .select-boat:focus { border-color: var(--primary); background: rgba(15, 23, 42, 0.9); }
-        .select-boat { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; background-size: 16px; appearance: none; }
 
-        /* Search */
+        .select-boat {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 15px center; background-size: 16px;
+            appearance: none;
+        }
+
+        /* Search Bar */
         .search-wrapper { margin: 10px 20px; position: relative; z-index: 1005; }
         .search-bar { width: 100%; background: var(--card-glass); border: 1px solid var(--border); padding: 15px 20px 15px 45px; border-radius: 18px; color: white; font-family: inherit; }
         .search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--primary); }
-        .search-results-dropdown { position: absolute; top: 100%; left: 0; right: 0; margin-top: 5px; background: #1e293b; border: 1px solid var(--border); border-radius: 16px; max-height: 250px; overflow-y: auto; display: none; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        
+        .search-results-dropdown {
+            position: absolute; top: 100%; left: 0; right: 0; margin-top: 5px;
+            background: #1e293b; border: 1px solid var(--border); border-radius: 16px;
+            max-height: 250px; overflow-y: auto; display: none; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
         .search-item { padding: 12px 15px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; cursor: pointer; }
+        .search-item span:first-child { color: var(--primary); font-weight: 700; font-size: 0.9rem; }
+        .search-item span:last-child { color: var(--text-dim); font-size: 0.75rem; }
 
         /* Cards */
-        .boat-card { background: var(--card-glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--border); position: relative; box-shadow: 0 10px 20px rgba(0,0,0,0.2); height: 100%; display: flex; flex-direction: column; }
+        .boat-card {
+            background: var(--card-glass); border-radius: 20px; overflow: hidden;
+            border: 1px solid var(--border); position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); height: 100%;
+            display: flex; flex-direction: column;
+        }
         .boat-img-container { width: 100%; height: 140px; background: #000; position: relative; }
         .boat-img { width: 100%; height: 100%; object-fit: cover; }
-        .boat-overlay-name { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(transparent, rgba(0,0,0,0.9)); padding: 20px 10px 8px 10px; font-weight: 800; font-size: 0.8rem; color: white; text-transform: uppercase; }
+        .boat-overlay-name {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+            padding: 20px 10px 8px 10px; font-weight: 800; font-size: 0.8rem;
+            color: white; text-transform: uppercase;
+        }
         .route-box { padding: 10px; font-size: 0.75rem; color: var(--text-dim); font-weight: 600; text-align: center; background: rgba(0,0,0,0.2); margin-top: auto; }
 
-        /* Estrelas */
-        .stars-display { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); padding: 4px 8px; border-radius: 8px; font-size: 0.7rem; color: #fbbf24; font-weight: 800; z-index: 10; display: flex; gap: 3px; border: 1px solid var(--border); }
-        .rating-interactive { display: flex; justify-content: center; gap: 10px; margin: 15px 0; }
-        .rating-interactive i { font-size: 1.8rem; color: #334155; cursor: pointer; transition: color 0.2s; }
-        .rating-interactive i.active { color: #fbbf24; }
-
         /* Modals */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 3000; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px; }
         .modal-content { background: #1e293b; width: 100%; max-width: 400px; border-radius: 24px; border: 1px solid var(--border); overflow-y: auto; max-height: 90vh; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .week-modal { display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 75%; background: #0f172a; border-radius: 30px 30px 0 0; border-top: 1px solid var(--primary); z-index: 2000; padding: 20px; box-shadow: 0 -10px 50px rgba(0,0,0,0.8); transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        
+        .week-modal {
+            display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 75%;
+            background: #0f172a; border-radius: 30px 30px 0 0; border-top: 1px solid var(--primary);
+            z-index: 2000; padding: 20px; box-shadow: 0 -10px 50px rgba(0,0,0,0.8);
+            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
         .week-modal.active { display: block; transform: translateY(0); }
 
-        /* FAB & Others */
+        /* Floating Action Button */
         .fab-container { position: fixed; bottom: 25px; right: 20px; display: flex; flex-direction: column; gap: 12px; z-index: 999; }
         .fab { width: 56px; height: 56px; border-radius: 18px; border: none; color: white; font-size: 1.4rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(0,0,0,0.4); cursor: pointer; }
+
+        /* Upload Area */
         .new-boat-section { border: 2px dashed var(--border); padding: 15px; border-radius: 16px; background: rgba(255,255,255,0.02); margin-bottom: 20px; display: none; text-align: center; }
         .upload-trigger { width: 100%; height: 120px; border-radius: 12px; background: rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-dim); margin-bottom: 10px; cursor: pointer; position: relative; overflow: hidden; }
+
+        /* Tags e Avaliação */
         .day-tag { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.6); color: var(--primary); padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; z-index: 10; border: 1px solid var(--border); }
+        .price-tag { position: absolute; top: 10px; right: 10px; background: var(--success); color: #000; padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; z-index: 10; }
+        
+        /* Estrelas Interativas */
+        .stars-container { display: flex; justify-content: center; gap: 8px; margin: 15px 0; }
+        .stars-container i { font-size: 1.5rem; color: #475569; cursor: pointer; transition: color 0.2s; }
+        .stars-container i.active { color: var(--accent); }
+
+        /* Alerts */
         .alert-box { background: #1e293b; padding: 25px; border-radius: 20px; border: 1px solid var(--primary); text-align: center; width: 85%; max-width: 300px; }
         .day-row { padding: 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-weight: 600; color: var(--text-dim); cursor: pointer; }
     </style>
@@ -130,8 +201,8 @@
 
         <div style="margin:20px; padding:20px; background:var(--card-glass); border-radius:20px; border:1px solid var(--border);">
             <div style="display:flex; justify-content:space-between; font-size:0.7rem; font-weight:700; margin-bottom:8px;">
-                <span style="color:var(--text-dim);">SEUS PONTOS (Meta: 500)</span>
-                <span style="color:var(--primary);"><b id="total-likes-count">0</b> PTS</span>
+                <span style="color:var(--text-dim);">PONTOS DE FIDELIDADE (Likes)</span>
+                <span style="color:var(--primary);"><b id="total-likes-count">0</b> / 500</span>
             </div>
             <div style="height:6px; background:rgba(0,0,0,0.3); border-radius:10px; overflow:hidden;">
                 <div id="thermometer-bar" style="height:100%; width:0%; background:var(--gradient); transition:width 1s;"></div>
@@ -165,23 +236,23 @@
 
     <div id="boat-modal" class="modal" onclick="closeModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <button class="btn-close-modal" onclick="closeModal()" style="position:absolute; top:15px; right:15px; z-index:20; background:rgba(0,0,0,0.5); border:none; width:35px; height:35px; border-radius:50%; color:white;"><i class="fas fa-times"></i></button>
+            <button class="btn-close-modal" onclick="closeModal()" style="position:absolute; top:15px; right:15px; z-index:20; background:rgba(0,0,0,0.5); border:none; width:35px; height:35px; border-radius:50%; color:white; cursor:pointer;"><i class="fas fa-times"></i></button>
             
             <img id="modal-img" style="width:100%; height:250px; object-fit:cover;">
             
             <div style="padding:25px;">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <h2 id="modal-name" style="margin:0; color:white; font-size:1.6rem; font-weight:800;"></h2>
-                    <button onclick="reportTrip()" style="background:rgba(239,68,68,0.1); border:1px solid var(--danger); width:40px; height:40px; border-radius:12px; color:var(--danger);"><i class="fas fa-exclamation-triangle"></i></button>
+                    <div>
+                        <h2 id="modal-name" style="margin:0; color:white; font-size:1.6rem; font-weight:800;"></h2>
+                        <div style="font-size:0.8rem; color:var(--accent); margin-top:5px;">
+                            <i class="fas fa-star"></i> <span id="modal-rating-avg">0.0</span> (Média)
+                        </div>
+                    </div>
+                    <button onclick="reportTrip()" style="background:rgba(239,68,68,0.1); border:1px solid var(--danger); width:40px; height:40px; border-radius:12px; color:var(--danger); cursor:pointer;"><i class="fas fa-exclamation-triangle"></i></button>
                 </div>
                 
-                <div style="display:flex; align-items:center; gap:5px; margin:5px 0 15px 0;">
-                    <i class="fas fa-star" style="color:#fbbf24;"></i>
-                    <span id="modal-stars-text" style="color:white; font-weight:700;">0.0</span>
-                    <span style="color:var(--text-dim); font-size:0.8rem;">(Média)</span>
-                </div>
-
-                <div id="modal-departure-text" style="color:var(--accent); font-size:0.85rem; margin-bottom:10px; font-weight:600;"></div>
+                <div id="modal-departure-text" style="color:var(--text-dim); font-size:0.85rem; margin:15px 0 5px 0;"></div>
+                
                 <div id="modal-route" style="background:rgba(255,255,255,0.05); padding:15px; border-radius:14px; text-align:center; border:1px solid var(--border); font-weight:700; color:white;"></div>
                 
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:15px; font-size:0.9rem;">
@@ -199,22 +270,24 @@
                 </div>
 
                 <div style="text-align:center; margin-top:20px; border-top:1px solid var(--border); padding-top:15px;">
-                    <span style="font-size:0.8rem; color:var(--text-dim); font-weight:700;">AVALIAR EMBARCAÇÃO</span>
-                    <div class="rating-interactive" id="star-container">
-                        <i class="far fa-star" onclick="rateBoat(1)" id="s1"></i>
-                        <i class="far fa-star" onclick="rateBoat(2)" id="s2"></i>
-                        <i class="far fa-star" onclick="rateBoat(3)" id="s3"></i>
-                        <i class="far fa-star" onclick="rateBoat(4)" id="s4"></i>
-                        <i class="far fa-star" onclick="rateBoat(5)" id="s5"></i>
+                    <span style="font-size:0.7rem; font-weight:700; color:var(--text-dim);">AVALIAR EMBARCAÇÃO</span>
+                    <div class="stars-container">
+                        <i class="far fa-star" id="s1" onclick="rateBoat(1)"></i>
+                        <i class="far fa-star" id="s2" onclick="rateBoat(2)"></i>
+                        <i class="far fa-star" id="s3" onclick="rateBoat(3)"></i>
+                        <i class="far fa-star" id="s4" onclick="rateBoat(4)"></i>
+                        <i class="far fa-star" id="s5" onclick="rateBoat(5)"></i>
                     </div>
                 </div>
 
                 <button id="btn-like" class="btn-main" style="background:var(--success); color:black; margin-top:5px; box-shadow:none;"><i class="far fa-thumbs-up"></i> CONFIRMAR VIAGEM (LIKE)</button>
 
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px;">
-                    <button id="btn-wa1" class="btn-main" style="background:#25d366; display:flex; align-items:center; justify-content:center; gap:8px;">WhatsApp 1</button>
-                    <button id="btn-wa2" class="btn-main" style="background:#128c7e; display:flex; align-items:center; justify-content:center; gap:8px;">WhatsApp 2</button>
+                    <button id="btn-wa1" class="btn-main" style="background:#25d366; display:flex; align-items:center; justify-content:center; gap:8px;">ZAP 1</button>
+                    <button id="btn-wa2" class="btn-main" style="background:#128c7e; display:flex; align-items:center; justify-content:center; gap:8px;">ZAP 2</button>
                 </div>
+                
+                <button id="btn-share-post" class="btn-main" style="background:var(--card-glass); border:1px solid var(--border); margin-top:10px;">COMPARTILHAR LINK</button>
             </div>
         </div>
     </div>
@@ -254,35 +327,42 @@
 
         <div id="new-boat-form" class="new-boat-section">
             <h4 style="margin:0 0 15px 0; color:var(--accent); font-size:0.9rem;">CADASTRAR NOVO BARCO</h4>
+            
             <input type="file" id="new-boat-file" accept="image/*" style="display:none" onchange="processNewBoatImage(this)">
             <div class="upload-trigger" onclick="document.getElementById('new-boat-file').click()">
                 <i class="fas fa-camera" style="font-size:2rem; color:var(--primary); margin-bottom:10px;"></i>
                 <span id="txt-photo-label" style="font-size:0.8rem;">Toque para adicionar foto</span>
                 <img id="new-boat-preview-img" style="width:100%; height:100%; object-fit:cover; border-radius:12px; display:none;">
             </div>
+
             <input type="text" id="new-boat-name" class="input-premium" placeholder="Nome da Embarcação">
             <input type="tel" id="new-boat-tel" class="input-premium" placeholder="WhatsApp (Somente números)">
         </div>
         
         <p style="color:var(--text-dim); font-size:0.8rem; margin-bottom:8px; font-weight:700; margin-top:20px;">2. DADOS DA VIAGEM</p>
         <input type="text" id="in-departure" class="input-premium" placeholder="Local de Saída (Porto)">
+        
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
             <input type="text" id="in-origin" class="input-premium" placeholder="Origem">
             <input type="text" id="in-destiny" class="input-premium" placeholder="Destino">
         </div>
+        
         <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:10px;">
             <input type="date" id="in-date" class="input-premium">
             <input type="time" id="in-time" class="input-premium">
         </div>
+
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
             <input type="number" id="in-price-p" class="input-premium" placeholder="Passagem R$">
             <input type="number" id="in-price-c" class="input-premium" placeholder="Camarote R$">
         </div>
+        
         <button class="btn-main" onclick="publish()" style="margin-top:25px; padding:18px; font-size:1.1rem;">PUBLICAR AGORA</button>
     </section>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // CONFIGURAÇÃO FIREBASE
             const firebaseConfig = {
                 apiKey: "AIzaSyCSqpD1irHfgXpzAytoRn_VNwImNzuGouE",
                 authDomain: "barcoapp01.firebaseapp.com",
@@ -292,13 +372,17 @@
                 messagingSenderId: "715122174520",
                 appId: "1:715122174520:web:da4ae91a6862c129d714cd"
             };
-            firebase.initializeApp(firebaseConfig);
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
             const rtdb = firebase.database();
 
+            // LOGIN ANÔNIMO
             firebase.auth().onAuthStateChanged((user) => {
                 if (!user) firebase.auth().signInAnonymously().catch(err => console.error(err));
             });
 
+            // ESTADO
             let currentUser = JSON.parse(localStorage.getItem('barco_user_data'));
             let currentDayPage = "";
             let showcaseSwiperInstance = null;
@@ -307,15 +391,21 @@
             let boatsDB = {}; 
             let selectedBoatData = null; 
             let currentNewBoatImg = "";
-            let currentOpenBoat = null; // Guardar dados do barco aberto no modal
+            let currentOpenBoat = null; 
             const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
 
             // --- UI HELPERS ---
             window.openCustomAlert = function(msg, title = "Sucesso!", icon="check") {
                 document.getElementById('alert-title').innerText = title;
                 document.getElementById('alert-msg').innerText = msg;
-                document.getElementById('alert-icon').className = icon === "error" ? "fas fa-times-circle" : "fas fa-check-circle";
-                document.getElementById('alert-icon').style.color = icon === "error" ? "var(--danger)" : "var(--success)";
+                const iconEl = document.getElementById('alert-icon');
+                if(icon === "error") {
+                    iconEl.className = "fas fa-times-circle";
+                    iconEl.style.color = "#ef4444";
+                } else {
+                    iconEl.className = "fas fa-check-circle";
+                    iconEl.style.color = "#10b981";
+                }
                 document.getElementById('custom-alert').style.display = 'flex';
             }
             window.closeCustomAlert = function() { document.getElementById('custom-alert').style.display = 'none'; }
@@ -331,7 +421,7 @@
             window.launchApp = function() {
                 const n = document.getElementById('user-name').value.trim();
                 const p = document.getElementById('user-phone').value.replace(/\D/g,'');
-                if(n.length < 3 || p.length < 8) return openCustomAlert("Dados inválidos", "Erro", "error");
+                if(n.length < 3 || p.length < 8) return openCustomAlert("Digite um nome e WhatsApp válidos", "Atenção", "error");
                 currentUser = { name: n, phone: p };
                 localStorage.setItem('barco_user_data', JSON.stringify(currentUser));
                 rtdb.ref('usuarios_cadastrados/' + p).update({ nome: n, whatsapp: p });
@@ -349,38 +439,38 @@
                 updateStats();
             }
 
-            // --- ESTRELAS E DENUNCIA ---
+            // --- AVALIAÇÃO & DENUNCIA ---
             window.rateBoat = function(stars) {
-                if(!currentOpenBoat || !currentOpenBoat.boatId) return;
-                // Salva a avaliação no ID do barco (permanente)
+                if(!currentOpenBoat || !currentOpenBoat.boatId) {
+                    openCustomAlert("Não foi possível avaliar este barco.", "Erro", "error");
+                    return;
+                }
                 const ref = rtdb.ref(`barco_avaliacoes/${currentOpenBoat.boatId}/${currentUser.phone}`);
                 ref.set({ stars: stars }).then(() => {
-                    // Atualiza visual
                     for(let i=1; i<=5; i++) {
                         const el = document.getElementById('s'+i);
-                        if(i <= stars) { el.classList.remove('far'); el.classList.add('fas'); el.classList.add('active'); }
-                        else { el.classList.remove('fas'); el.classList.add('far'); el.classList.remove('active'); }
+                        if(i <= stars) { el.className = "fas fa-star active"; el.style.color = "#f59e0b"; }
+                        else { el.className = "far fa-star"; el.style.color = "#475569"; }
                     }
-                    openCustomAlert(`Você avaliou com ${stars} estrelas!`);
+                    openCustomAlert(`Avaliado com ${stars} estrelas!`);
                 });
             }
 
             window.reportTrip = function() {
                 if(!currentOpenBoat) return;
-                if(confirm("Deseja denunciar esta publicação como falsa ou ofensiva?")) {
+                if(confirm("Denunciar esta publicação por conteúdo impróprio ou falso?")) {
                     rtdb.ref(`denuncias/${Date.now()}`).set({
-                        tripId: currentOpenBoat.key, // ID da viagem
+                        tripId: currentOpenBoat.key,
                         boatName: currentOpenBoat.name,
                         reportedBy: currentUser.phone,
-                        reason: "Denúncia via App"
+                        reason: "Denúncia App"
                     }).then(() => {
-                        openCustomAlert("Denúncia enviada para análise.", "Feito");
-                        closeModal();
+                        openCustomAlert("Denúncia enviada para análise.", "Recebido");
                     });
                 }
             }
 
-            // --- LOGICA DE REGISTRO ---
+            // --- LÓGICA DE REGISTRO ---
             window.loadRegisteredBoats = function() {
                 const select = document.getElementById('boat-selector');
                 select.innerHTML = '<option value="">Carregando...</option>';
@@ -397,17 +487,17 @@
 
             window.onSelectBoat = function() {
                 const id = document.getElementById('boat-selector').value;
-                const previewDiv = document.getElementById('selected-boat-preview');
-                const newForm = document.getElementById('new-boat-form');
+                const prev = document.getElementById('selected-boat-preview');
+                const form = document.getElementById('new-boat-form');
                 if(id === 'new_entry') {
-                    selectedBoatData = null; previewDiv.style.display = 'none'; newForm.style.display = 'block';
+                    selectedBoatData = null; prev.style.display = 'none'; form.style.display = 'block';
                 } else if(id && boatsDB[id]) {
                     selectedBoatData = boatsDB[id];
                     document.getElementById('preview-db-img').src = selectedBoatData.img;
                     document.getElementById('preview-db-name').innerText = selectedBoatData.name;
-                    previewDiv.style.display = 'block'; newForm.style.display = 'none';
+                    prev.style.display = 'block'; form.style.display = 'none';
                 } else {
-                    selectedBoatData = null; previewDiv.style.display = 'none'; newForm.style.display = 'none';
+                    selectedBoatData = null; prev.style.display = 'none'; form.style.display = 'none';
                 }
             }
 
@@ -468,46 +558,41 @@
                 rtdb.ref('barcos/' + dN).push(trip).then(() => {
                     openCustomAlert("Viagem publicada!");
                     navigate('screen-main');
+                    // Reset
                     document.getElementById('boat-selector').value = "";
                     document.getElementById('selected-boat-preview').style.display = 'none';
                     document.getElementById('new-boat-form').style.display = 'none';
                 });
             }
 
-            // --- FEEDS ---
+            // --- FEEDS & DETAILS ---
             function listenDynamicShowcase() {
-                rtdb.ref('barcos').on('value', snap => {
+                rtdb.ref('barcos').limitToLast(30).on('value', snap => {
                     const w = document.getElementById('dynamic-showcase-wrapper'); w.innerHTML="";
                     allBoatsLocal = [];
                     const d = snap.val();
-                    if(!d) { w.innerHTML = '<div style="padding:20px; color:gray">Sem viagens.</div>'; return; }
+                    if(!d) { w.innerHTML = '<div style="padding:20px; color:gray">Nenhuma viagem agendada.</div>'; return; }
                     
                     const frag = document.createDocumentFragment();
                     Object.keys(d).forEach(day => {
-                        Object.keys(d[day]).forEach(k => {
-                            const b = d[day][k]; b.key = k; b.dia = day;
-                            allBoatsLocal.push(b);
-                            
-                            // Busca media de estrelas do barco (assíncrono basico)
-                            let starHTML = "";
-                            if(b.boatId) {
-                                // Nota: Para performance real, ideal seria ter a media salva no objeto do barco
-                                // Aqui vamos deixar sem estrela no card para nao pesar, ou por um placeholder
-                            }
-
-                            const div = document.createElement('div');
-                            div.className = 'swiper-slide boat-slide-item';
-                            div.style.width = '200px';
-                            div.innerHTML = `
-                                <div class="boat-card" onclick="openDirectDetails('${day}','${k}')">
-                                    <div class="day-tag">${day}</div>
-                                    <div class="price-tag">R$ ${b.price_p}</div>
-                                    <div class="boat-img-container"><img src="${b.img}" class="boat-img" loading="lazy"></div>
-                                    <div class="boat-overlay-name">${b.name}</div>
-                                    <div class="route-box">${b.origin} <i class="fas fa-arrow-right" style="color:var(--primary)"></i> ${b.destiny}</div>
-                                </div>`;
-                            frag.appendChild(div);
-                        });
+                        if(d[day]) {
+                            Object.keys(d[day]).forEach(k => {
+                                const b = d[day][k]; b.key = k; b.dia = day;
+                                allBoatsLocal.push(b);
+                                const div = document.createElement('div');
+                                div.className = 'swiper-slide boat-slide-item';
+                                div.style.width = '200px';
+                                div.innerHTML = `
+                                    <div class="boat-card" onclick="openDirectDetails('${day}','${k}')">
+                                        <div class="day-tag">${day}</div>
+                                        <div class="price-tag">R$ ${b.price_p}</div>
+                                        <div class="boat-img-container"><img src="${b.img}" class="boat-img" loading="lazy"></div>
+                                        <div class="boat-overlay-name">${b.name}</div>
+                                        <div class="route-box">${b.origin} <i class="fas fa-arrow-right" style="color:var(--primary)"></i> ${b.destiny}</div>
+                                    </div>`;
+                                frag.appendChild(div);
+                            });
+                        }
                     });
                     w.appendChild(frag);
                     if(showcaseSwiperInstance) showcaseSwiperInstance.destroy();
@@ -531,31 +616,21 @@
             }
 
             window.selectSearchItem = function(d,k) { document.getElementById('main-search').value=""; document.getElementById('search-dropdown').style.display='none'; openDirectDetails(d,k); }
+            
+            // Função wrapper para chamadas do HTML
             window.openDirectDetails = function(d,k) { currentDayPage=d; openDetails(k); }
-            window.toggleWeek = function(s) { const m=document.getElementById('weekModal'); if(s){m.style.display='block';setTimeout(()=>m.classList.add('active'),10)}else{m.classList.remove('active');setTimeout(()=>m.style.display='none',300)} }
-            window.closeModal = function() { document.getElementById('boat-modal').style.display='none'; }
-            window.renderWeekList = function() { document.getElementById('week-list-container').innerHTML = diasSemana.map(d=>`<div class="day-row" onclick="changePage('${d}');toggleWeek(false)"><span>${d}</span><i class="fas fa-chevron-right"></i></div>`).join(''); }
-            window.changePage = function(d) { currentDayPage=d; document.getElementById('day-title').innerText=d; navigate('screen-day-detail'); loadFeed(); }
-
-            window.loadFeed = function() {
-                const f = document.getElementById('boat-feed'); f.innerHTML="<div style='color:white;padding:20px'>Carregando...</div>";
-                rtdb.ref('barcos/'+currentDayPage).once('value', s => {
-                    f.innerHTML=""; const d=s.val();
-                    if(d) Object.keys(d).forEach(k => {
-                        const b=d[k];
-                        f.innerHTML += `<div class="boat-card" onclick="openDetails('${k}')" style="margin-bottom:15px; height:auto;"><div class="boat-img-container" style="height:160px;"><img src="${b.img}" class="boat-img" loading="lazy"></div><div class="boat-overlay-name">${b.name}</div><div class="route-box"><span>${b.origin}</span> <i class="fas fa-arrow-right" style="color:var(--primary)"></i> <span>${b.destiny}</span></div></div>`;
-                    }); else f.innerHTML="<p style='padding:20px;color:gray'>Sem viagens.</p>";
-                });
-            }
 
             window.openDetails = function(k) {
                 rtdb.ref(`barcos/${currentDayPage}/${k}`).once('value', s => {
-                    const b = s.val(); if(!b) return;
-                    currentOpenBoat = b; currentOpenBoat.key = k; // Salva ref para denuncia/estrela
+                    const b = s.val(); 
+                    if(!b) { openCustomAlert("Publicação não encontrada.", "Erro", "error"); return; }
+                    
+                    currentOpenBoat = b; 
+                    currentOpenBoat.key = k; // Salva chave para uso posterior (denuncia/voto)
                     
                     document.getElementById('modal-img').src = b.img;
                     document.getElementById('modal-name').innerText = b.name;
-                    document.getElementById('modal-departure-text').innerHTML = `<i class="fas fa-map-marker-alt"></i> SAÍDA: ${b.departure||"Porto"}`;
+                    document.getElementById('modal-departure-text').innerText = `SAÍDA: ${b.departure||"Porto"}`;
                     document.getElementById('modal-route').innerHTML = `${b.origin} <i class="fas fa-arrow-right"></i> ${b.destiny}`;
                     document.getElementById('modal-date').innerText = formatDateBR(b.date);
                     document.getElementById('modal-time').innerText = b.time;
@@ -568,19 +643,18 @@
                     if(b.tel2) { document.getElementById('btn-wa2').style.display='flex'; document.getElementById('btn-wa2').onclick=()=>window.open(`https://wa.me/55${b.tel2.replace(/\D/g,'')}`); }
                     else document.getElementById('btn-wa2').style.display='none';
 
-                    // Resetar estrelas visuais
-                    for(let i=1;i<=5;i++){ const el=document.getElementById('s'+i); el.classList.remove('fas','active'); el.classList.add('far'); }
-                    document.getElementById('modal-stars-text').innerText = "0.0";
+                    // Reset Estrelas
+                    for(let i=1; i<=5; i++) { const s = document.getElementById('s'+i); s.className = "far fa-star"; s.style.color = "#475569"; }
+                    document.getElementById('modal-rating-avg').innerText = "0.0";
 
-                    // Carregar Média de Estrelas
+                    // Carregar Média Estrelas
                     if(b.boatId) {
                         rtdb.ref(`barco_avaliacoes/${b.boatId}`).once('value', snap => {
-                            const ratings = snap.val();
-                            if(ratings) {
-                                let total = 0, count = 0;
-                                Object.values(ratings).forEach(r => { total += r.stars; count++; });
-                                const avg = (total/count).toFixed(1);
-                                document.getElementById('modal-stars-text').innerText = avg;
+                            const r = snap.val();
+                            if(r) {
+                                let total=0, c=0;
+                                Object.values(r).forEach(v => { total+=v.stars; c++; });
+                                document.getElementById('modal-rating-avg').innerText = (total/c).toFixed(1);
                             }
                         });
                     }
@@ -590,17 +664,17 @@
             }
 
             window.shareBoat = function(b) {
-                const txt = encodeURIComponent(`🚢 *BARCOAPP*\n*${b.name}*\n${b.origin} > ${b.destiny}\n📅 ${formatDateBR(b.date)} - ${b.time}`);
+                const txt = encodeURIComponent(`🚢 *BARCOAPP*\n*${b.name}*\n${b.origin} > ${b.destiny}\n📅 ${formatDateBR(b.date)} - ${b.time}\n💰 R$ ${b.price_p}`);
                 window.open(`https://wa.me/?text=${txt}`, '_blank');
             }
 
             window.registerVote = function(k, t) {
                 const ref = rtdb.ref(`votos_registrados/${k}/${currentUser.phone}`);
                 ref.once('value', s => {
-                    if(s.exists()) return openCustomAlert("Já votou!", "Aviso", "error");
+                    if(s.exists()) return openCustomAlert("Já confirmou presença!", "Aviso");
                     ref.set({voto:t}).then(() => {
                         rtdb.ref(`barcos/${currentDayPage}/${k}/${t}`).transaction(v=>(v||0)+1);
-                        openCustomAlert("Like Confirmado!");
+                        openCustomAlert("Presença Confirmada!");
                     });
                 });
             }
@@ -628,12 +702,27 @@
                     let pts=0; const d=s.val();
                     if(d) Object.values(d).forEach(day => {
                         Object.values(day).forEach(b => { 
-                            // SOMA APENAS LIKES
                             if(b.registeredBy === currentUser.phone) pts += (b.likes||0); 
                         });
                     });
                     document.getElementById('total-likes-count').innerText = pts;
                     document.getElementById('thermometer-bar').style.width = Math.min((pts/500)*100, 100) + '%';
+                });
+            }
+
+            window.toggleWeek = function(s) { const m=document.getElementById('weekModal'); if(s){m.style.display='block';setTimeout(()=>m.classList.add('active'),10)}else{m.classList.remove('active');setTimeout(()=>m.style.display='none',300)} }
+            window.closeModal = function() { document.getElementById('boat-modal').style.display='none'; }
+            window.renderWeekList = function() { document.getElementById('week-list-container').innerHTML = diasSemana.map(d=>`<div class="day-row" onclick="changePage('${d}');toggleWeek(false)"><span>${d}</span><i class="fas fa-chevron-right"></i></div>`).join(''); }
+            window.changePage = function(d) { currentDayPage=d; document.getElementById('day-title').innerText=d; navigate('screen-day-detail'); loadFeed(); }
+            
+            window.loadFeed = function() {
+                const f = document.getElementById('boat-feed'); f.innerHTML="<div style='color:white;padding:20px'>Carregando...</div>";
+                rtdb.ref('barcos/'+currentDayPage).once('value', s => {
+                    f.innerHTML=""; const d=s.val();
+                    if(d) Object.keys(d).forEach(k => {
+                        const b=d[k];
+                        f.innerHTML += `<div class="boat-card" onclick="openDetails('${k}')" style="margin-bottom:15px; height:auto;"><div class="day-tag" style="background:var(--success); color:black;">R$ ${b.price_p}</div><div class="boat-img-container"><img src="${b.img}" class="boat-img" loading="lazy"></div><div class="boat-overlay-name">${b.name}</div><div class="route-box"><span>${b.origin}</span> <i class="fas fa-arrow-right" style="color:var(--primary)"></i> <span>${b.destiny}</span></div></div>`;
+                    }); else f.innerHTML="<p style='padding:20px;color:gray'>Sem viagens.</p>";
                 });
             }
 
