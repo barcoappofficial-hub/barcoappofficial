@@ -89,6 +89,10 @@
         /* CUSTOM ALERT */
         #custom-alert { display: none; position: fixed; bottom: 20px; right: 20px; background: var(--success); color: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 10000; font-weight: 700; animation: slideIn 0.3s ease; }
         @keyframes slideIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        /* Banner Item */
+        .banner-item { position: relative; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: #000; }
+        .banner-link-tag { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.7); font-size: 0.6rem; padding: 4px; text-align: center; color: var(--primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     </style>
 </head>
 <body>
@@ -208,9 +212,15 @@
             <div class="panel">
                 <div class="panel-header"><h3>Carrossel de Banners</h3></div>
                 <div class="panel-body p-content">
-                    <input type="text" id="banner-url" placeholder="URL da Imagem do Banner">
+                    <label style="font-size:0.7rem; color:var(--text-dim); font-weight:700;">IMAGEM DO BANNER (URL)</label>
+                    <input type="text" id="banner-url" placeholder="https://exemplo.com/banner.jpg">
+                    
+                    <label style="font-size:0.7rem; color:var(--text-dim); font-weight:700;">LINK AO CLICAR (OPCIONAL)</label>
+                    <input type="text" id="banner-link" placeholder="https://site-patrocinador.com">
+                    
                     <button class="btn btn-primary" onclick="addBanner()">ADICIONAR BANNER</button>
-                    <div id="banner-list" style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px;"></div>
+                    
+                    <div id="banner-list" style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;"></div>
                 </div>
             </div>
         </div>
@@ -246,12 +256,12 @@
                 document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
                 btn.classList.add('active');
                 
-                if(window.innerWidth <= 768) toggleSidebar(); // Fecha menu no mobile
+                if(window.innerWidth <= 768) toggleSidebar(); 
             }
 
             window.handleLogin = function() {
                 const p = document.getElementById('admin-pass').value;
-                if(p === "barco77") { // SENHA SIMPLES
+                if(p === "barco77") { 
                     document.getElementById('login-overlay').style.display = 'none';
                     document.getElementById('sidebar').style.display = 'flex';
                     document.getElementById('main-content').style.display = 'block';
@@ -288,10 +298,8 @@
             function updateStats(data) {
                 const users = data.usuarios_cadastrados ? Object.keys(data.usuarios_cadastrados).length : 0;
                 const fleet = data.barcos_cadastrados ? Object.keys(data.barcos_cadastrados).length : 0;
-                
                 let trips = 0;
                 let totalLikes = 0;
-                
                 if(data.barcos) {
                     Object.values(data.barcos).forEach(day => {
                         Object.values(day).forEach(t => {
@@ -300,14 +308,13 @@
                         });
                     });
                 }
-
                 document.getElementById('st-users').innerText = users;
                 document.getElementById('st-fleet').innerText = fleet;
                 document.getElementById('st-trips').innerText = trips;
                 document.getElementById('st-likes').innerText = totalLikes;
             }
 
-            // --- GESTÃO DE FROTA (ADD NEW BOAT) ---
+            // --- GESTÃO DE FROTA ---
             window.processFleetImage = function(input) {
                 if (input.files && input.files[0]) {
                     const reader = new FileReader();
@@ -321,7 +328,6 @@
                             canvas.height = img.height * scale;
                             canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
                             fleetImgBase64 = canvas.toDataURL('image/jpeg', 0.6);
-                            
                             const preview = document.getElementById('fleet-preview');
                             preview.src = fleetImgBase64;
                             preview.style.display = 'block';
@@ -335,7 +341,6 @@
                 const name = document.getElementById('fleet-name').value;
                 const t1 = document.getElementById('fleet-tel1').value;
                 const t2 = document.getElementById('fleet-tel2').value;
-
                 if(!name || !t1 || !fleetImgBase64) return alert("Preencha Nome, Telefone 1 e Foto");
 
                 const id = Date.now();
@@ -343,7 +348,6 @@
                     id: id, name: name, tel1: t1, tel2: t2, img: fleetImgBase64
                 }).then(() => {
                     showToast("Barco Cadastrado!");
-                    // Limpar form
                     document.getElementById('fleet-name').value = "";
                     document.getElementById('fleet-preview').style.display = 'none';
                     fleetImgBase64 = "";
@@ -372,7 +376,7 @@
                 }
             }
 
-            // --- VIAGENS E RANKING ---
+            // --- VIAGENS ---
             window.deleteTrip = function(day, key) { if(confirm("Apagar viagem?")) db.ref(`barcos/${day}/${key}`).remove(); }
 
             function renderTrips(barcos) {
@@ -401,12 +405,9 @@
                 const list = document.getElementById('users-list');
                 const rankList = document.getElementById('ranking-list');
                 list.innerHTML = "";
-                
                 let userScores = [];
-
                 if(users) {
                     Object.entries(users).forEach(([uid, u]) => {
-                        // Calcula pontos
                         let points = 0;
                         if(barcos) {
                             Object.values(barcos).forEach(day => {
@@ -425,8 +426,6 @@
                             <td><button class="btn-icon btn-danger" onclick="deleteUser('${uid}')"><i class="fas fa-user-slash"></i></button></td>
                         </tr>`;
                     });
-
-                    // Render Ranking
                     userScores.sort((a,b) => b.points - a.points);
                     rankList.innerHTML = userScores.slice(0, 5).map((u, i) => `
                         <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid var(--border)">
@@ -437,7 +436,7 @@
                 }
             }
 
-            // --- CONFIGS ---
+            // --- CONFIGS & CARROSSEL ---
             window.setGlobalAlert = function(active) {
                 const txt = document.getElementById('alert-text-config').value;
                 db.ref('config/alerta').set({text: txt, active: active}).then(()=> showToast(active ? "Alerta Ativado" : "Alerta Removido"));
@@ -445,9 +444,17 @@
 
             window.addBanner = function() {
                 const url = document.getElementById('banner-url').value;
-                if(url) db.ref('config/carrossel').push({img: url}).then(()=> {
-                    document.getElementById('banner-url').value=""; showToast("Banner Add");
-                });
+                const link = document.getElementById('banner-link').value; // PEGA O LINK
+                
+                if(url) {
+                    db.ref('config/carrossel').push({img: url, link: link}).then(()=> {
+                        document.getElementById('banner-url').value="";
+                        document.getElementById('banner-link').value="";
+                        showToast("Banner Adicionado");
+                    });
+                } else {
+                    alert("A imagem é obrigatória!");
+                }
             }
 
             window.delBanner = function(k) { if(confirm("Apagar banner?")) db.ref(`config/carrossel/${k}`).remove(); }
@@ -458,7 +465,15 @@
                 blist.innerHTML = "";
                 if(cfg && cfg.carrossel) {
                     Object.entries(cfg.carrossel).forEach(([k, v]) => {
-                        blist.innerHTML += `<div style="position:relative"><img src="${v.img}" style="width:100%; border-radius:8px;"><button onclick="delBanner('${k}')" style="position:absolute; top:2px; right:2px; background:red; color:white; border:none; border-radius:4px;">X</button></div>`;
+                        // Mostra se tem link ou não
+                        const linkTag = v.link ? `<div class="banner-link-tag"><i class="fas fa-link"></i> ${v.link}</div>` : '';
+                        
+                        blist.innerHTML += `
+                        <div class="banner-item">
+                            <img src="${v.img}" style="width:100%; display:block;">
+                            ${linkTag}
+                            <button onclick="delBanner('${k}')" style="position:absolute; top:5px; right:5px; background:rgba(255,0,0,0.8); color:white; border:none; border-radius:4px; width:24px; height:24px; cursor:pointer;">X</button>
+                        </div>`;
                     });
                 }
             }
