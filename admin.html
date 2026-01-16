@@ -398,7 +398,9 @@
                 });
             }
 
-            window.deleteFleet = function(id) { if(confirm("Apagar este barco da base?")) db.ref('barcos_cadastrados/' + id).remove(); }
+            window.deleteFleet = function(id) {
+                if(confirm("Apagar este barco da base?")) db.ref('barcos_cadastrados/' + id).remove();
+            }
 
             function renderFleet(fleet) {
                 const list = document.getElementById('fleet-list');
