@@ -2,97 +2,155 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Instalar BarcoApp</title>
 
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#020617">
+    
+    <link rel="apple-touch-icon" href="icone.png">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         body {
             margin: 0; padding: 0; height: 100vh;
-            font-family: 'sans-serif';
+            font-family: 'Plus Jakarta Sans', sans-serif;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             text-align: center;
-            background: linear-gradient(rgba(7, 11, 20, 0.75), rgba(7, 11, 20, 0.75)), url('fundoentrada.png');
-            background-size: cover; background-position: center;
-            color: white;
+            background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
+            color: white; overflow: hidden;
         }
 
-        /* ESTILO DO ÍCONE/LOGO */
-        .app-logo {
-            width: 110px; height: 110px;
-            border-radius: 28px;
-            margin-bottom: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 2px solid rgba(255,255,255,0.1);
+        /* Fundo Decorativo */
+        body::before {
+            content: ''; position: absolute; top: -100px; left: -100px;
+            width: 300px; height: 300px; background: radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 70%);
+            z-index: -1;
+        }
+        body::after {
+            content: ''; position: absolute; bottom: -100px; right: -100px;
+            width: 300px; height: 300px; background: radial-gradient(circle, rgba(59,130,246,0.2) 0%, transparent 70%);
+            z-index: -1;
         }
 
-        .btn-main {
-            width: 280px; padding: 16px; border-radius: 14px; border: none;
-            background: linear-gradient(135deg, #22d3ee 0%, #a855f7 100%);
-            color: white; font-weight: 800; cursor: pointer; margin: 10px 0;
+        /* LOGO */
+        .app-icon {
+            width: 120px; height: 120px;
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            border-radius: 30px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 20px 50px rgba(6,182,212,0.3);
+            margin-bottom: 25px;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
+
+        h1 { font-size: 2.5rem; font-weight: 800; margin: 0; letter-spacing: -1px; }
+        p { color: #94a3b8; font-size: 1rem; max-width: 300px; margin: 10px auto 30px auto; line-height: 1.5; }
+
+        /* AREA DE INSTALAÇÃO */
+        .install-box {
+            background: rgba(30, 41, 59, 0.6);
+            padding: 30px; border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            width: 90%; max-width: 350px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        }
+
+        .btn-install {
+            width: 100%; padding: 18px; border: none; border-radius: 16px;
+            font-weight: 800; font-size: 1rem; cursor: pointer;
             display: flex; align-items: center; justify-content: center; gap: 10px;
+            margin-bottom: 15px; transition: transform 0.2s;
+            text-transform: uppercase;
+        }
+        .btn-install:active { transform: scale(0.97); }
+
+        .btn-android { background: #3ddc84; color: #000; box-shadow: 0 5px 20px rgba(61, 220, 132, 0.3); }
+        .btn-ios { background: #ffffff; color: #000; box-shadow: 0 5px 20px rgba(255,255,255,0.2); }
+
+        .link-web {
+            margin-top: 25px; display: block;
+            color: #06b6d4; text-decoration: none;
+            font-weight: 700; font-size: 0.9rem;
+            opacity: 0.8; transition: opacity 0.2s;
+        }
+        .link-web:hover { opacity: 1; }
+
+        /* RODAPÉ */
+        .footer {
+            position: absolute; bottom: 20px;
+            font-size: 0.7rem; color: #64748b;
         }
     </style>
 </head>
 <body>
 
-    <img src="icone.png" alt="BarcoApp Logo" class="app-logo">
+    <div class="app-icon">
+        <i class="fas fa-ship" style="font-size: 3.5rem; color: white;"></i>
+    </div>
 
-    <h1 style="font-size:3rem; margin:0;">BarcoApp</h1>
-    <p>Instale agora para ver as escalas oficiais.</p>
+    <h1>BarcoApp</h1>
+    <p>Acompanhe horários, preços e escalas de embarcações em tempo real.</p>
 
-    <div id="install-area" style="background: rgba(0,0,0,0.6); padding: 25px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);">
-        <p style="font-size: 0.8rem; font-weight: 800; margin-bottom: 15px; opacity: 0.7;">ESCOLHA SEU CELULAR</p>
+    <div id="install-area" class="install-box">
+        <div style="font-size: 0.7rem; font-weight: 800; color: #94a3b8; margin-bottom: 20px; letter-spacing: 1px;">INSTALAR APLICATIVO</div>
         
-        <button id="btnInstall" class="btn-main" style="background: #3ddc84; color: #000; display: flex;">
-            <i class="fab fa-android"></i> INSTALAR ANDROID
+        <button id="btnInstall" class="btn-install btn-android">
+            <i class="fab fa-android"></i> Instalar Android
         </button>
         
-        <button onclick="alert('No iPhone: Toque no ícone de Compartilhar (seta para cima) e escolha Adicionar à Tela de Início')" class="btn-main" style="background: #fff; color: #000;">
-            <i class="fab fa-apple"></i> INSTALAR IPHONE
+        <button onclick="showIosInstruction()" class="btn-install btn-ios">
+            <i class="fab fa-apple"></i> Instalar iPhone
         </button>
     </div>
 
-    <a href="app.html" style="color: #22d3ee; margin-top: 35px; text-decoration: none; font-size: 0.9rem; font-weight: 700;">
-        Já tenho o App ou quero entrar agora →
-    </a>
+    <a href="app.html" class="link-web">Acessar Versão Web Agora <i class="fas fa-arrow-right"></i></a>
+
+    <div class="footer">Versão 3.0 • Premium</div>
 
     <script>
-        // REGISTRO DO SERVICE WORKER
+        // REGISTRO DO SERVICE WORKER (Para funcionar offline/instalação)
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js');
         }
 
         let deferredPrompt;
 
-        // Captura o evento de instalação se ele disparar
+        // Escuta o evento que o navegador dispara quando o app pode ser instalado
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            console.log("Evento PWA capturado com sucesso.");
+            console.log("Pronto para instalar!");
         });
 
-        // Lógica do Clique no Botão
+        // Lógica do Android
         document.getElementById('btnInstall').addEventListener('click', async () => {
             if (deferredPrompt) {
-                // Se o Android liberar, mostra o prompt oficial
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') {
                     deferredPrompt = null;
                 }
             } else {
-                // SE O BOTÃO "SUMIR" TÉCNICAMENTE (SEGUNDA VEZ), ENSINA O MANUAL
-                alert("Para instalar agora:\n\n1. Clique nos 3 pontinhos do Chrome (topo direito).\n2. Selecione 'Instalar aplicativo' ou 'Adicionar à tela inicial'.");
+                // Fallback se o navegador não suportar a instalação automática
+                alert("Para instalar:\n1. Toque nos 3 pontinhos do navegador (↗)\n2. Escolha 'Instalar aplicativo' ou 'Adicionar à tela inicial'");
             }
         });
 
-        // SE O APP JÁ ESTIVER INSTALADO, ESCONDE OS BOTÕES
+        // Lógica do iOS (Alert simples)
+        function showIosInstruction() {
+            alert("No iPhone/iPad:\n\n1. Toque no ícone de Compartilhar (quadrado com seta para cima ⬆)\n2. Role para baixo e toque em 'Adicionar à Tela de Início' (➕)");
+        }
+
+        // Se já estiver rodando como App (Standalone), redireciona direto
         if (window.matchMedia('(display-mode: standalone)').matches) {
-            document.getElementById('install-area').style.display = 'none';
+            window.location.href = "app.html";
         }
     </script>
 </body>
