@@ -12,13 +12,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js" defer></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js" defer></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
 
     <style>
         :root {
-            --primary: #22d3ee; --primary-glow: rgba(34, 211, 238, 0.3);
+            --primary: #22d3ee;
             --bg-dark: #020617; --bg-card: #0f172a; --text-main: #f1f5f9; --text-dim: #94a3b8;
             --danger: #f43f5e; --success: #10b981; --warning: #fbbf24;
             --border: rgba(255, 255, 255, 0.08); --sidebar-width: 260px;
@@ -82,9 +82,6 @@
         @keyframes slideIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         
         .badge { background: var(--danger); color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; margin-left: 5px; }
-        
-        .fleet-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.03); margin-bottom: 8px; border-radius: 12px; border: 1px solid transparent; transition: 0.2s; }
-        .fleet-item:hover { border-color: var(--primary); background: rgba(34, 211, 238, 0.05); }
     </style>
 </head>
 <body>
@@ -153,8 +150,8 @@
 
                 <div class="panel">
                     <div class="panel-header"><h3>Frota Atual</h3></div>
-                    <div class="panel-body p-content" style="flex: 1; min-height: 400px;">
-                        <div id="fleet-list" style="max-height: 600px; overflow-y: auto;">
+                    <div class="panel-body p-content" style="flex: 1; min-height: 400px; display:flex; flex-direction:column;">
+                        <div id="fleet-list" style="flex:1; overflow-y: auto;">
                             <div style="text-align:center; color:gray; padding:20px;">Carregando frota...</div>
                         </div>
                     </div>
@@ -221,7 +218,11 @@
                 messagingSenderId: "715122174520",
                 appId: "1:715122174520:web:da4ae91a6862c129d714cd"
             };
-            firebase.initializeApp(firebaseConfig);
+            
+            // Inicializa apenas se não existir
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
             const db = firebase.database();
             
             let fleetImgBase64 = "";
@@ -240,7 +241,7 @@
                     document.getElementById('login-overlay').style.display = 'none';
                     document.getElementById('sidebar').style.display = 'flex';
                     document.getElementById('main-content').style.display = 'block';
-                    firebase.auth().signInAnonymously();
+                    firebase.auth().signInAnonymously().catch(err => alert("Erro Auth: " + err.message));
                     initDashboard();
                 } else alert("Senha errada");
             }
@@ -254,10 +255,15 @@
             function initDashboard() {
                 db.ref().on('value', snap => {
                     const data = snap.val();
-                    if(!data) { renderFleet(null); return; }
+                    
+                    // Se não tiver dados, limpa tudo
+                    if(!data) { 
+                        renderFleet(null); 
+                        return; 
+                    }
                     
                     updateStats(data);
-                    renderFleet(data.barcos_cadastrados);
+                    renderFleet(data.barcos_cadastrados); // Chama renderFleet explicitamente
                     renderTrips(data.barcos);
                     renderUsers(data.usuarios_cadastrados, data.barcos);
                     renderReports(data.denuncias);
@@ -282,7 +288,7 @@
                 badge.innerText = reports;
             }
 
-            // FROTA
+            // FROTA - CORREÇÃO DE RENDERIZAÇÃO
             window.processFleetImage = function(input) {
                 if (input.files && input.files[0]) {
                     const r = new FileReader();
@@ -316,24 +322,34 @@
 
             window.deleteFleet = function(id) { if(confirm("Apagar?")) db.ref('barcos_cadastrados/'+id).remove(); }
 
+            // RENDER FLEET BLINDADO
             function renderFleet(fleet) {
+                console.log("Renderizando frota:", fleet); // Para debug
                 const list = document.getElementById('fleet-list');
-                list.innerHTML = "";
-                if(fleet && Object.keys(fleet).length > 0) {
-                    Object.values(fleet).forEach(b => {
-                        list.innerHTML += `
-                        <div class="fleet-item">
-                            <img src="${b.img}" style="width:50px; height:50px; border-radius:10px; object-fit:cover; background:#000;">
-                            <div style="flex:1;">
-                                <div style="font-weight:700; color:white;">${b.name}</div>
-                                <div style="font-size:0.8rem; color:#94a3b8;">${b.tel1}</div>
-                            </div>
-                            <button class="btn-icon btn-danger" onclick="deleteFleet('${b.id}')"><i class="fas fa-trash"></i></button>
-                        </div>`;
-                    });
-                } else {
-                    list.innerHTML = "<div style='text-align:center; padding:30px; color:#64748b;'>Nenhum barco na base de dados.</div>";
+                
+                if (!fleet || Object.keys(fleet).length === 0) {
+                    list.innerHTML = "<div style='text-align:center; padding:30px; color:#64748b;'>Nenhum barco cadastrado.</div>";
+                    return;
                 }
+
+                let htmlContent = "";
+                Object.values(fleet).forEach(b => {
+                    const img = b.img || 'icone.png'; // Fallback
+                    const name = b.name || 'Sem Nome';
+                    const tel = b.tel1 || 'Sem Tel';
+                    
+                    htmlContent += `
+                    <div style="display:flex; align-items:center; gap:12px; padding:12px; background:rgba(255,255,255,0.03); margin-bottom:8px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
+                        <img src="${img}" style="width:50px; height:50px; border-radius:10px; object-fit:cover; background:#000;">
+                        <div style="flex:1;">
+                            <div style="font-weight:700; color:#f1f5f9;">${name}</div>
+                            <div style="font-size:0.8rem; color:#94a3b8;">${tel}</div>
+                        </div>
+                        <button class="btn-icon" style="background:rgba(244,63,94,0.2); color:#f43f5e;" onclick="deleteFleet('${b.id}')"><i class="fas fa-trash"></i></button>
+                    </div>`;
+                });
+                
+                list.innerHTML = htmlContent;
             }
 
             // OUTROS RENDERIZADORES
