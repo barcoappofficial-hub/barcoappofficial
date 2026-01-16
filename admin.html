@@ -93,6 +93,9 @@
         /* Banner Item */
         .banner-item { position: relative; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: #000; }
         .banner-link-tag { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.7); font-size: 0.6rem; padding: 4px; text-align: center; color: var(--primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* Badge Notification */
+        .badge { background: var(--danger); color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; margin-left: 5px; }
     </style>
 </head>
 <body>
@@ -116,6 +119,7 @@
         <div class="nav-item active" onclick="showSection('dashboard', this)"><i class="fas fa-chart-pie"></i> Visão Geral</div>
         <div class="nav-item" onclick="showSection('fleet', this)"><i class="fas fa-ship"></i> Frota Base (Outros)</div>
         <div class="nav-item" onclick="showSection('trips', this)"><i class="fas fa-calendar-alt"></i> Viagens Ativas</div>
+        <div class="nav-item" onclick="showSection('reports', this)" style="color: var(--danger);"><i class="fas fa-exclamation-triangle"></i> Denúncias <span id="badge-reports" class="badge" style="display:none">0</span></div>
         <div class="nav-item" onclick="showSection('users', this)"><i class="fas fa-users"></i> Usuários</div>
         <div class="nav-item" onclick="showSection('config', this)"><i class="fas fa-cog"></i> Configurações</div>
         <div style="margin-top: auto;">
@@ -130,12 +134,27 @@
                 <div class="stat-card"><small style="color:var(--primary)">Usuários</small><h2 id="st-users">0</h2></div>
                 <div class="stat-card"><small style="color:var(--success)">Barcos Cadastrados</small><h2 id="st-fleet">0</h2></div>
                 <div class="stat-card"><small style="color:var(--warning)">Viagens Hoje</small><h2 id="st-trips">0</h2></div>
-                <div class="stat-card"><small>Saldo Likes</small><h2 id="st-likes">0</h2></div>
+                <div class="stat-card" style="border-color:var(--danger)"><small style="color:var(--danger)">Denúncias Pendentes</small><h2 id="st-reports">0</h2></div>
             </div>
             
             <div class="panel">
                 <div class="panel-header"><h3><i class="fas fa-trophy" style="color:var(--warning)"></i> Top Ranking de Popularidade</h3></div>
                 <div class="panel-body p-content" id="ranking-list">Carregando...</div>
+            </div>
+        </div>
+
+        <div id="sec-reports" style="display:none;">
+            <div class="panel" style="border-color: var(--danger);">
+                <div class="panel-header"><h3 style="color:var(--danger)"><i class="fas fa-exclamation-triangle"></i> Denúncias Recebidas</h3></div>
+                <div class="panel-body p-content">
+                    <p style="color:var(--text-dim); font-size:0.9rem;">Verifique as publicações sinalizadas pelos usuários.</p>
+                    <div class="table-responsive">
+                        <table>
+                            <thead><tr><th>Barco</th><th>Motivo</th><th>Denunciante</th><th>Ação</th></tr></thead>
+                            <tbody id="reports-list"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -166,8 +185,7 @@
                 <div>
                     <div class="panel">
                         <div class="panel-header"><h3>Frota Cadastrada</h3></div>
-                        <div class="panel-body p-content" id="fleet-list" style="max-height: 500px; overflow-y: auto;">
-                            </div>
+                        <div class="panel-body p-content" id="fleet-list" style="max-height: 500px; overflow-y: auto;"></div>
                     </div>
                 </div>
             </div>
@@ -252,10 +270,8 @@
             window.showSection = function(id, btn) {
                 document.querySelectorAll('.main > div').forEach(d => d.style.display = 'none');
                 document.getElementById('sec-' + id).style.display = 'block';
-                
                 document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
                 btn.classList.add('active');
-                
                 if(window.innerWidth <= 768) toggleSidebar(); 
             }
 
@@ -290,6 +306,7 @@
                     renderFleet(data.barcos_cadastrados);
                     renderTrips(data.barcos);
                     renderUsers(data.usuarios_cadastrados, data.barcos);
+                    renderReports(data.denuncias); // NOVA FUNÇÃO
                     renderConfig(data.config);
                 });
             }
@@ -298,6 +315,7 @@
             function updateStats(data) {
                 const users = data.usuarios_cadastrados ? Object.keys(data.usuarios_cadastrados).length : 0;
                 const fleet = data.barcos_cadastrados ? Object.keys(data.barcos_cadastrados).length : 0;
+                const reports = data.denuncias ? Object.keys(data.denuncias).length : 0;
                 let trips = 0;
                 let totalLikes = 0;
                 if(data.barcos) {
@@ -312,6 +330,37 @@
                 document.getElementById('st-fleet').innerText = fleet;
                 document.getElementById('st-trips').innerText = trips;
                 document.getElementById('st-likes').innerText = totalLikes;
+                document.getElementById('st-reports').innerText = reports;
+                
+                // Badge na Sidebar
+                const badge = document.getElementById('badge-reports');
+                if(reports > 0) { badge.style.display = 'inline-block'; badge.innerText = reports; }
+                else badge.style.display = 'none';
+            }
+
+            // --- DENUNCIAS (NOVO) ---
+            window.resolveReport = function(key) {
+                if(confirm("Marcar denúncia como resolvida (apagar)?")) {
+                    db.ref(`denuncias/${key}`).remove().then(() => showToast("Denúncia resolvida"));
+                }
+            }
+
+            function renderReports(reports) {
+                const list = document.getElementById('reports-list');
+                list.innerHTML = "";
+                if(reports) {
+                    Object.entries(reports).forEach(([key, r]) => {
+                        list.innerHTML += `
+                        <tr>
+                            <td><b style="color:var(--primary)">${r.boatName || 'Desconhecido'}</b></td>
+                            <td>${r.reason}</td>
+                            <td>${r.reportedBy}</td>
+                            <td><button class="btn btn-primary" onclick="resolveReport('${key}')">RESOLVER</button></td>
+                        </tr>`;
+                    });
+                } else {
+                    list.innerHTML = "<tr><td colspan='4' style='text-align:center; color:gray;'>Nenhuma denúncia pendente.</td></tr>";
+                }
             }
 
             // --- GESTÃO DE FROTA ---
@@ -323,9 +372,7 @@
                         img.src = e.target.result;
                         img.onload = function() {
                             const canvas = document.createElement('canvas');
-                            const scale = 500 / img.width;
-                            canvas.width = 500;
-                            canvas.height = img.height * scale;
+                            const scale = 500 / img.width; canvas.width = 500; canvas.height = img.height * scale;
                             canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
                             fleetImgBase64 = canvas.toDataURL('image/jpeg', 0.6);
                             const preview = document.getElementById('fleet-preview');
@@ -342,11 +389,8 @@
                 const t1 = document.getElementById('fleet-tel1').value;
                 const t2 = document.getElementById('fleet-tel2').value;
                 if(!name || !t1 || !fleetImgBase64) return alert("Preencha Nome, Telefone 1 e Foto");
-
                 const id = Date.now();
-                db.ref('barcos_cadastrados/' + id).set({
-                    id: id, name: name, tel1: t1, tel2: t2, img: fleetImgBase64
-                }).then(() => {
+                db.ref('barcos_cadastrados/' + id).set({ id: id, name: name, tel1: t1, tel2: t2, img: fleetImgBase64 }).then(() => {
                     showToast("Barco Cadastrado!");
                     document.getElementById('fleet-name').value = "";
                     document.getElementById('fleet-preview').style.display = 'none';
@@ -354,9 +398,7 @@
                 });
             }
 
-            window.deleteFleet = function(id) {
-                if(confirm("Apagar este barco da base?")) db.ref('barcos_cadastrados/' + id).remove();
-            }
+            window.deleteFleet = function(id) { if(confirm("Apagar este barco da base?")) db.ref('barcos_cadastrados/' + id).remove(); }
 
             function renderFleet(fleet) {
                 const list = document.getElementById('fleet-list');
@@ -417,22 +459,10 @@
                             });
                         }
                         userScores.push({name: u.nome, points: points});
-
-                        list.innerHTML += `
-                        <tr>
-                            <td><b>${u.nome}</b></td>
-                            <td>${u.whatsapp}</td>
-                            <td><span style="color:${points>=0?'var(--primary)':'var(--danger)'}">${points} Pts</span></td>
-                            <td><button class="btn-icon btn-danger" onclick="deleteUser('${uid}')"><i class="fas fa-user-slash"></i></button></td>
-                        </tr>`;
+                        list.innerHTML += `<tr><td><b>${u.nome}</b></td><td>${u.whatsapp}</td><td><span style="color:${points>=0?'var(--primary)':'var(--danger)'}">${points} Pts</span></td><td><button class="btn-icon btn-danger" onclick="deleteUser('${uid}')"><i class="fas fa-user-slash"></i></button></td></tr>`;
                     });
                     userScores.sort((a,b) => b.points - a.points);
-                    rankList.innerHTML = userScores.slice(0, 5).map((u, i) => `
-                        <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid var(--border)">
-                            <span>${i+1}º ${u.name}</span>
-                            <span style="font-weight:800; color:var(--primary)">${u.points}</span>
-                        </div>
-                    `).join('');
+                    rankList.innerHTML = userScores.slice(0, 5).map((u, i) => `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid var(--border)"><span>${i+1}º ${u.name}</span><span style="font-weight:800; color:var(--primary)">${u.points}</span></div>`).join('');
                 }
             }
 
@@ -444,17 +474,14 @@
 
             window.addBanner = function() {
                 const url = document.getElementById('banner-url').value;
-                const link = document.getElementById('banner-link').value; // PEGA O LINK
-                
+                const link = document.getElementById('banner-link').value; 
                 if(url) {
                     db.ref('config/carrossel').push({img: url, link: link}).then(()=> {
                         document.getElementById('banner-url').value="";
                         document.getElementById('banner-link').value="";
                         showToast("Banner Adicionado");
                     });
-                } else {
-                    alert("A imagem é obrigatória!");
-                }
+                } else { alert("A imagem é obrigatória!"); }
             }
 
             window.delBanner = function(k) { if(confirm("Apagar banner?")) db.ref(`config/carrossel/${k}`).remove(); }
@@ -465,15 +492,8 @@
                 blist.innerHTML = "";
                 if(cfg && cfg.carrossel) {
                     Object.entries(cfg.carrossel).forEach(([k, v]) => {
-                        // Mostra se tem link ou não
                         const linkTag = v.link ? `<div class="banner-link-tag"><i class="fas fa-link"></i> ${v.link}</div>` : '';
-                        
-                        blist.innerHTML += `
-                        <div class="banner-item">
-                            <img src="${v.img}" style="width:100%; display:block;">
-                            ${linkTag}
-                            <button onclick="delBanner('${k}')" style="position:absolute; top:5px; right:5px; background:rgba(255,0,0,0.8); color:white; border:none; border-radius:4px; width:24px; height:24px; cursor:pointer;">X</button>
-                        </div>`;
+                        blist.innerHTML += `<div class="banner-item"><img src="${v.img}" style="width:100%; display:block;">${linkTag}<button onclick="delBanner('${k}')" style="position:absolute; top:5px; right:5px; background:rgba(255,0,0,0.8); color:white; border:none; border-radius:4px; width:24px; height:24px; cursor:pointer;">X</button></div>`;
                     });
                 }
             }
