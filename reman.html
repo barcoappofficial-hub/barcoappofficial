@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Remanso | Gestão Fluvial</title>
+    <title>Remanso | Gestão</title>
     
     <meta name="theme-color" content="#0f172a">
-    <link rel="manifest" href="manifest.json"> <link rel="apple-touch-icon" href="icone.png">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icone.png">
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -17,189 +18,302 @@
 
     <style>
         :root {
-            --bg: #0f172a; 
-            --card: #1e293b; 
-            --text: #f8fafc; 
-            --text-dim: #94a3b8;
-            --primary: #fbbf24; /* Dourado para o Remanso (Gestão) */
-            --primary-dark: #d97706;
-            --accent: #22d3ee; /* Azul do BarcoApp para detalhes */
-            --glass: rgba(30, 41, 59, 0.7);
+            --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --text-dim: #94a3b8;
+            --primary: #fbbf24; /* Dourado Base */
+            --accent: #22d3ee;
             --gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --premium-glow: 0 0 20px rgba(251, 191, 36, 0.2);
         }
 
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow-x: hidden; display: flex; flex-direction: column; }
 
         /* HEADER */
-        .header { padding: 25px; display: flex; align-items: center; gap: 15px; }
-        .logo-box { width: 50px; height: 50px; background: var(--gradient); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #0f172a; box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
+        .header { padding: 20px; background: var(--card); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between; }
+        .boat-info h2 { margin: 0; font-size: 1.1rem; color: var(--primary); }
+        .boat-info p { margin: 0; font-size: 0.8rem; color: var(--text-dim); }
         
-        /* TELAS */
-        .screen { display: none; padding: 20px; flex: 1; animation: fadeIn 0.5s ease; }
-        .screen.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .status-badge { font-size: 0.7rem; padding: 5px 12px; border-radius: 20px; background: rgba(255,255,255,0.1); font-weight: 700; color: var(--text-dim); }
+        .status-badge.premium { background: var(--gradient); color: #000; box-shadow: var(--premium-glow); }
 
-        /* FORMULARIOS */
-        .input-group { margin-bottom: 20px; }
-        .label-title { display: block; color: var(--primary); font-size: 0.8rem; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        /* DASHBOARD GRID */
+        .container { padding: 20px; flex: 1; overflow-y: auto; }
         
-        input { width: 100%; background: var(--card); border: 1px solid rgba(255,255,255,0.1); padding: 16px; border-radius: 14px; color: white; font-size: 1rem; transition: 0.3s; }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.2); }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: var(--card); padding: 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); text-align: center; }
+        .stat-val { font-size: 1.5rem; font-weight: 800; display: block; margin-bottom: 5px; }
+        .stat-label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; }
 
-        /* UPLOAD DE FOTO */
-        .upload-box { height: 180px; border: 2px dashed var(--text-dim); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 25px; position: relative; overflow: hidden; background: rgba(255,255,255,0.02); cursor: pointer; transition: 0.3s; }
-        .upload-box:active { background: rgba(255,255,255,0.05); }
-        .preview-img { width: 100%; height: 100%; object-fit: cover; position: absolute; display: none; }
+        /* ACTIONS */
+        .action-btn { width: 100%; padding: 20px; border-radius: 18px; border: none; font-weight: 800; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; transition: transform 0.2s; }
+        .btn-gold { background: var(--gradient); color: #0f172a; box-shadow: var(--premium-glow); }
+        .btn-dark { background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.1); }
+        .action-btn:active { transform: scale(0.98); }
 
-        /* BOTÕES */
-        .btn-main { width: 100%; padding: 18px; border-radius: 16px; border: none; background: var(--gradient); color: #0f172a; font-weight: 800; font-size: 1.1rem; cursor: pointer; box-shadow: 0 10px 30px rgba(251, 191, 36, 0.2); display: flex; align-items: center; justify-content: center; gap: 10px; transition: transform 0.2s; }
-        .btn-main:active { transform: scale(0.97); }
+        /* PREMIUM LOCK */
+        .premium-lock { position: relative; opacity: 0.5; pointer-events: none; }
+        .lock-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--primary); font-size: 1.5rem; z-index: 10; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
 
-        /* CARD DE BOAS VINDAS */
-        .welcome-card { background: var(--card); padding: 25px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.05); text-align: center; margin-bottom: 30px; }
+        /* CADASTRO (INITIAL SCREEN) */
+        .setup-screen { display: none; height: 100vh; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; }
+        .setup-screen.active { display: flex; }
+        .upload-circle { width: 120px; height: 120px; border-radius: 50%; border: 2px dashed var(--text-dim); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; overflow: hidden; position: relative; background: rgba(255,255,255,0.05); }
+        input.setup-input { width: 100%; padding: 15px; background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white; margin-bottom: 15px; outline: none; }
+
+        /* MODAL PUBLISH */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); z-index: 200; padding: 20px; overflow-y: auto; }
+        .close-modal { position: absolute; top: 20px; right: 20px; background: none; border: none; color: white; font-size: 1.5rem; }
     </style>
 </head>
 <body>
 
-    <div id="screen-register" class="screen">
-        <div class="header" style="justify-content: center; margin-bottom: 20px;">
-            <div class="logo-box"><i class="fas fa-ship"></i></div>
-            <div>
-                <h1 style="margin:0; font-size: 1.5rem;">Remanso</h1>
-                <p style="margin:0; color:var(--text-dim); font-size:0.9rem;">Painel do Comandante</p>
-            </div>
+    <div id="screen-setup" class="setup-screen">
+        <h1 style="color:var(--primary); margin-bottom:10px;">Bem-vindo ao Remanso</h1>
+        <p style="color:var(--text-dim); margin-bottom:30px;">Painel de gestão para proprietários.</p>
+        
+        <div class="upload-circle" onclick="document.getElementById('setup-file').click()">
+            <i class="fas fa-camera" style="font-size:2rem; color:var(--text-dim)"></i>
+            <img id="setup-preview" style="width:100%; height:100%; object-fit:cover; display:none; position:absolute;">
         </div>
-
-        <div class="welcome-card">
-            <h2 style="margin:0 0 10px 0;">Bem-vindo a Bordo!</h2>
-            <p style="margin:0; font-size:0.9rem; color:var(--text-dim);">Para começar a gerenciar suas viagens e encomendas, precisamos cadastrar sua embarcação.</p>
-        </div>
-
-        <div class="input-group">
-            <span class="label-title">Foto da Embarcação</span>
-            <div class="upload-box" onclick="document.getElementById('reg-photo').click()">
-                <i class="fas fa-camera" style="font-size: 2rem; color: var(--text-dim); margin-bottom: 10px;"></i>
-                <span style="font-size: 0.8rem; color: var(--text-dim);">Toque para adicionar foto</span>
-                <img id="preview-reg" class="preview-img">
-            </div>
-            <input type="file" id="reg-photo" accept="image/*" style="display:none" onchange="previewImage(this)">
-        </div>
-
-        <div class="input-group">
-            <span class="label-title">Nome da Embarcação</span>
-            <input type="text" id="reg-name" placeholder="Ex: Expresso Deus é Fiel">
-        </div>
-
-        <div class="input-group">
-            <span class="label-title">WhatsApp para Contato</span>
-            <input type="tel" id="reg-tel" placeholder="(DD) 90000-0000">
-        </div>
-
-        <button class="btn-main" onclick="saveRegistration()">
-            CRIAR MEU PAINEL <i class="fas fa-arrow-right"></i>
-        </button>
+        <input type="file" id="setup-file" accept="image/*" style="display:none" onchange="previewSetup(this)">
+        
+        <input type="text" id="setup-name" class="setup-input" placeholder="Nome da Embarcação">
+        <input type="tel" id="setup-tel" class="setup-input" placeholder="WhatsApp do Responsável">
+        
+        <button class="action-btn btn-gold" onclick="registerOwner()">CRIAR MEU PAINEL</button>
     </div>
 
-    <div id="screen-dashboard" class="screen">
-        <div style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
-            <div class="logo-box" style="width: 80px; height: 80px; font-size: 2rem; margin-bottom: 20px;">
-                <i class="fas fa-check"></i>
+    <div id="screen-dash" style="display:none; flex-direction: column; height: 100%;">
+        <div class="header">
+            <div class="boat-info">
+                <h2 id="dash-name">Carregando...</h2>
+                <p>Painel de Controle</p>
             </div>
-            <h2>Tudo Pronto!</h2>
-            <p style="color: var(--text-dim);">Seu painel Remanso está configurado.</p>
-            <p style="color: var(--primary); font-weight: 700;">Próximo passo: Configurar as ferramentas.</p>
+            <div id="badge-status" class="status-badge">BÁSICO</div>
         </div>
+
+        <div class="container">
+            <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:10px; font-weight:700;">ESTATÍSTICAS TOTAIS</p>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-val" style="color:var(--accent)" id="st-likes">0</span>
+                    <span class="stat-label">Total de Likes</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-val" style="color:var(--primary)" id="st-stars">0.0</span>
+                    <span class="stat-label">Média Estrelas</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-val" style="color:#fff" id="st-trips">0</span>
+                    <span class="stat-label">Viagens Ativas</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-val" style="color:#10b981" id="st-views">--</span>
+                    <span class="stat-label">Visualizações</span>
+                </div>
+            </div>
+
+            <button class="action-btn btn-gold" onclick="openPublish()">
+                <i class="fas fa-plus-circle"></i> NOVA VIAGEM
+            </button>
+
+            <button class="action-btn btn-dark" onclick="alert('Área de Encomendas em breve!')">
+                <i class="fas fa-box-open"></i> GESTÃO DE ENCOMENDAS
+            </button>
+
+            <div id="premium-area" class="premium-lock" style="margin-top:20px;">
+                <div class="lock-icon" id="lock-icon"><i class="fas fa-lock"></i></div>
+                <div style="background:var(--card); padding:20px; border-radius:18px; border:1px solid rgba(251, 191, 36, 0.1);">
+                    <h3 style="margin:0 0 10px 0; color:var(--text);">Relatório Financeiro</h3>
+                    <div style="height:10px; background:#0f172a; border-radius:5px; margin-bottom:10px; width:70%;"></div>
+                    <div style="height:10px; background:#0f172a; border-radius:5px; width:40%;"></div>
+                    <p style="font-size:0.8rem; color:var(--primary); margin-top:10px;">Exclusivo para assinantes.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="publish-modal" class="modal">
+        <button class="close-modal" onclick="closePublish()"><i class="fas fa-times"></i></button>
+        <h2 style="color:var(--primary); margin-top:0;">Nova Viagem</h2>
+        
+        <label style="color:var(--text-dim); font-size:0.8rem;">ROTA</label>
+        <input type="text" id="p-origin" class="setup-input" placeholder="Origem">
+        <input type="text" id="p-destiny" class="setup-input" placeholder="Destino">
+        <input type="text" id="p-local" class="setup-input" placeholder="Local de Saída (Porto/Balsa)">
+
+        <label style="color:var(--text-dim); font-size:0.8rem;">QUANDO</label>
+        <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:10px;">
+            <input type="date" id="p-date" class="setup-input">
+            <input type="time" id="p-time" class="setup-input">
+        </div>
+
+        <label style="color:var(--text-dim); font-size:0.8rem;">VALORES (R$)</label>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <input type="number" id="p-price-p" class="setup-input" placeholder="Passagem">
+            <input type="number" id="p-price-c" class="setup-input" placeholder="Camarote">
+        </div>
+
+        <button class="action-btn btn-gold" onclick="confirmPublish()">PUBLICAR AGORA</button>
     </div>
 
     <script>
-        // CONFIGURAÇÃO FIREBASE (Mantenha a mesma do seu app)
-        const firebaseConfig = {
-            apiKey: "AIzaSyCSqpD1irHfgXpzAytoRn_VNwImNzuGouE",
-            authDomain: "barcoapp01.firebaseapp.com",
-            databaseURL: "https://barcoapp01-default-rtdb.firebaseio.com",
-            projectId: "barcoapp01",
-            storageBucket: "barcoapp01.firebasestorage.app",
-            messagingSenderId: "715122174520",
-            appId: "1:715122174520:web:da4ae91a6862c129d714cd"
-        };
-        
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        const rtdb = firebase.database();
+        document.addEventListener('DOMContentLoaded', function() {
+            // CONFIG FIREBASE
+            const firebaseConfig = {
+                apiKey: "AIzaSyCSqpD1irHfgXpzAytoRn_VNwImNzuGouE",
+                authDomain: "barcoapp01.firebaseapp.com",
+                databaseURL: "https://barcoapp01-default-rtdb.firebaseio.com",
+                projectId: "barcoapp01",
+                storageBucket: "barcoapp01.firebasestorage.app",
+                messagingSenderId: "715122174520",
+                appId: "1:715122174520:web:da4ae91a6862c129d714cd"
+            };
+            if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+            const rtdb = firebase.database();
 
-        // Variável para guardar a imagem em Base64
-        let currentImageBase64 = "";
+            // AUTH ANÔNIMA
+            firebase.auth().onAuthStateChanged(u => { if(!u) firebase.auth().signInAnonymously(); });
 
-        // Verifica se já existe cadastro no celular
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedData = localStorage.getItem('remanso_data');
-            if(savedData) {
-                // Se já tem cadastro, pula direto pro Dashboard (Passo 2)
-                document.getElementById('screen-register').classList.remove('active');
-                document.getElementById('screen-dashboard').classList.add('active');
-                // Aqui depois vamos carregar o painel real
+            let ownerData = JSON.parse(localStorage.getItem('remanso_data'));
+            let setupImgBase64 = "";
+            const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
+
+            // 1. VERIFICA SE JÁ TEM CADASTRO
+            if(ownerData && ownerData.id) {
+                initDashboard(ownerData.id);
             } else {
-                document.getElementById('screen-register').classList.add('active');
+                document.getElementById('screen-setup').classList.add('active');
+            }
+
+            // FUNÇÃO: CARREGAR DADOS REAIS DO FIREBASE
+            function initDashboard(boatId) {
+                document.getElementById('screen-setup').classList.remove('active');
+                document.getElementById('screen-dash').style.display = 'flex';
+
+                // Buscar infos oficiais do cadastro (ex: status premium)
+                rtdb.ref('barcos_cadastrados/' + boatId).on('value', snap => {
+                    const data = snap.val();
+                    if(data) {
+                        document.getElementById('dash-name').innerText = data.name;
+                        // Verifica se é Premium
+                        if(data.premium === true) {
+                            enablePremiumMode();
+                        }
+                    }
+                });
+
+                // Calcular Estatísticas (Likes e Viagens Ativas)
+                rtdb.ref('barcos').on('value', snap => {
+                    const allDays = snap.val();
+                    let totalLikes = 0;
+                    let activeTrips = 0;
+
+                    if(allDays) {
+                        Object.values(allDays).forEach(day => {
+                            Object.values(day).forEach(trip => {
+                                // Verifica se a viagem pertence a este barco (pelo ID ou Telefone)
+                                if(trip.boatId == boatId || trip.registeredBy == ownerData.tel) {
+                                    totalLikes += (trip.likes || 0);
+                                    activeTrips++; // Aqui poderia filtrar por data futura
+                                }
+                            });
+                        });
+                    }
+                    document.getElementById('st-likes').innerText = totalLikes;
+                    document.getElementById('st-trips').innerText = activeTrips;
+                });
+
+                // Calcular Média de Estrelas
+                rtdb.ref('barco_avaliacoes/' + boatId).on('value', snap => {
+                    const ratings = snap.val();
+                    if(ratings) {
+                        let sum = 0, count = 0;
+                        Object.values(ratings).forEach(r => { sum += r.stars; count++; });
+                        document.getElementById('st-stars').innerText = (sum/count).toFixed(1);
+                    } else {
+                        document.getElementById('st-stars').innerText = "0.0";
+                    }
+                });
+            }
+
+            // FUNÇÃO: ATIVAR MODO PREMIUM (VISUAL)
+            function enablePremiumMode() {
+                const badge = document.getElementById('badge-status');
+                badge.innerText = "PREMIUM";
+                badge.classList.add('premium');
+                
+                const area = document.getElementById('premium-area');
+                area.classList.remove('premium-lock');
+                area.style.opacity = "1";
+                area.style.pointerEvents = "auto";
+                document.getElementById('lock-icon').style.display = 'none';
+            }
+
+            // CADASTRO INICIAL
+            window.previewSetup = function(input) {
+                if (input.files && input.files[0]) {
+                    const r = new FileReader();
+                    r.onload = e => {
+                        const img = new Image(); img.src = e.target.result;
+                        img.onload = () => {
+                            const c = document.createElement('canvas'); c.width=500; c.height=(500/img.width)*img.height;
+                            c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+                            setupImgBase64 = c.toDataURL('image/jpeg',0.7);
+                            document.getElementById('setup-preview').src = setupImgBase64;
+                            document.getElementById('setup-preview').style.display='block';
+                        }
+                    }; r.readAsDataURL(input.files[0]);
+                }
+            }
+
+            window.registerOwner = function() {
+                const n = document.getElementById('setup-name').value;
+                const t = document.getElementById('setup-tel').value;
+                if(!n || !t || !setupImgBase64) return alert("Preencha tudo!");
+
+                const id = Date.now();
+                ownerData = { id: id, name: n, tel: t, img: setupImgBase64, premium: false };
+                
+                // Salva no Local e no Firebase
+                localStorage.setItem('remanso_data', JSON.stringify(ownerData));
+                rtdb.ref('barcos_cadastrados/'+id).set(ownerData).then(() => {
+                    initDashboard(id);
+                });
+            }
+
+            // PUBLICAÇÃO DE VIAGEM
+            window.openPublish = function() { document.getElementById('publish-modal').style.display = 'block'; }
+            window.closePublish = function() { document.getElementById('publish-modal').style.display = 'none'; }
+
+            window.confirmPublish = function() {
+                const dateV = document.getElementById('p-date').value;
+                if(!dateV) return alert("Data obrigatória!");
+
+                const p = dateV.split('-'); 
+                const dN = diasSemana[new Date(p[0], p[1]-1, p[2]).getDay()];
+
+                const trip = {
+                    boatId: ownerData.id,
+                    name: ownerData.name,
+                    img: ownerData.img,
+                    tel1: ownerData.tel,
+                    origin: document.getElementById('p-origin').value,
+                    destiny: document.getElementById('p-destiny').value,
+                    departure: document.getElementById('p-local').value,
+                    date: dateV,
+                    time: document.getElementById('p-time').value,
+                    price_p: document.getElementById('p-price-p').value,
+                    price_c: document.getElementById('p-price-c').value,
+                    likes: 0, dislikes: 0, registeredBy: ownerData.tel
+                };
+
+                rtdb.ref('barcos/'+dN).push(trip).then(() => {
+                    alert("Viagem publicada! Ela já aparece no BarcoApp.");
+                    closePublish();
+                });
             }
         });
-
-        // Função de Preview da Imagem
-        window.previewImage = function(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    const img = new Image();
-                    img.src = e.target.result;
-                    img.onload = () => {
-                        // Redimensionar para não pesar o banco
-                        const canvas = document.createElement('canvas');
-                        const maxWidth = 600;
-                        const scale = maxWidth / img.width;
-                        canvas.width = maxWidth;
-                        canvas.height = img.height * scale;
-                        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-                        
-                        currentImageBase64 = canvas.toDataURL('image/jpeg', 0.7);
-                        
-                        const preview = document.getElementById('preview-reg');
-                        preview.src = currentImageBase64;
-                        preview.style.display = 'block';
-                    }
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        // Salvar Cadastro
-        window.saveRegistration = function() {
-            const name = document.getElementById('reg-name').value;
-            const tel = document.getElementById('reg-tel').value;
-
-            if(!name || !tel || !currentImageBase64) {
-                alert("Por favor, preencha todos os campos e a foto.");
-                return;
-            }
-
-            const ownerData = {
-                id: Date.now(), // ID único
-                name: name,
-                tel: tel,
-                img: currentImageBase64,
-                joinedAt: new Date().toISOString()
-            };
-
-            // 1. Salva no Celular (Local)
-            localStorage.setItem('remanso_data', JSON.stringify(ownerData));
-
-            // 2. Salva no Firebase (Para o Admin ver)
-            // Usamos signInAnonymously para ter permissão de escrita
-            firebase.auth().signInAnonymously().then(() => {
-                rtdb.ref('proprietarios/' + ownerData.id).set(ownerData).then(() => {
-                    alert("Bem-vindo ao Remanso!");
-                    location.reload(); // Recarrega para ir pro dashboard
-                });
-            }).catch(err => alert("Erro de conexão: " + err.message));
-        }
     </script>
 </body>
 </html>
