@@ -88,36 +88,14 @@
         }
         .search-item { padding: 12px 15px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; cursor: pointer; }
 
-        /* --- NOVO: GRID DUPLO (Layout de Grade) --- */
-        .boats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr; /* Duas colunas iguais */
-            gap: 15px;
-            padding-bottom: 20px;
-        }
-
-        /* Card do Grid (Vertical) */
-        .grid-boat-card {
-            background: var(--card-glass); 
-            border-radius: 20px; 
-            border: 1px solid var(--border);
-            display: flex; flex-direction: column; /* Vertical */
-            overflow: hidden; position: relative;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            height: 100%;
-        }
-
-        .grid-boat-img {
-            width: 100%; height: 110px; /* Altura fixa da imagem */
-            object-fit: cover; background: #0f172a;
-        }
-
+        /* --- GRID DUPLO --- */
+        .boats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding-bottom: 20px; }
+        .grid-boat-card { background: var(--card-glass); border-radius: 20px; border: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.2); height: 100%; }
+        .grid-boat-img { width: 100%; height: 110px; object-fit: cover; background: #0f172a; }
         .grid-boat-info { padding: 10px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
         .grid-boat-name { font-weight: 800; font-size: 0.9rem; color: white; margin-bottom: 4px; line-height: 1.2; }
         .grid-boat-route { font-size: 0.7rem; color: var(--text-dim); display: flex; align-items: center; gap: 4px; margin-bottom: 6px; }
         .grid-boat-time { font-size: 0.75rem; color: var(--primary); font-weight: 700; background: rgba(6,182,212,0.1); padding: 4px 8px; border-radius: 6px; display: inline-block; text-align: center; }
-
-        /* Tag Flutuante do Dia (em cima da foto) */
         .grid-day-tag { position: absolute; top: 8px; left: 8px; font-size: 0.6rem; background: rgba(0,0,0,0.7); color: white; padding: 2px 8px; border-radius: 4px; font-weight: 700; backdrop-filter: blur(2px); }
 
         /* Modals */
@@ -126,20 +104,24 @@
         .week-modal { display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 75%; background: #0f172a; border-radius: 30px 30px 0 0; border-top: 1px solid var(--primary); z-index: 2000; padding: 20px; box-shadow: 0 -10px 50px rgba(0,0,0,0.8); transform: translateY(100%); transition: transform 0.3s; }
         .week-modal.active { display: block; transform: translateY(0); }
 
-        /* --- BOTÕES FLUTUANTES AUMENTADOS --- */
+        /* --- BOTÕES FLUTUANTES (FABs) ATUALIZADOS --- */
+        /* Container Principal (Rodapé) */
         .nav-fabs {
             position: fixed; bottom: 30px; left: 0; right: 0;
             padding: 0 30px;
             display: flex; justify-content: space-between;
             pointer-events: none; z-index: 1000;
         }
+        
+        /* Estilo dos Botões Principais (Perfil/Agenda) - AGORA CIRCULARES */
         .nav-fab-btn {
             pointer-events: auto;
-            width: 72px; height: 72px; /* Aumentado de 60px para 72px */
-            border-radius: 24px; border: none;
-            color: white; font-size: 1.8rem; /* Ícone maior */
+            width: 60px; height: 60px; /* Tamanho ligeiramente maior que os mini */
+            border-radius: 50%; /* Círculo perfeito */
+            border: none;
+            color: white; font-size: 1.5rem;
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             cursor: pointer; transition: transform 0.2s; position: relative;
         }
         .nav-fab-btn:active { transform: scale(0.9); }
@@ -147,6 +129,7 @@
         .fab-profile { background: #334155; border: 1px solid var(--border); }
         .fab-agenda { background: var(--gradient); }
 
+        /* Container e Estilo dos Botões Secundários (Zap/Add) - JÁ ERAM CIRCULARES */
         .action-fabs { position: fixed; bottom: 120px; right: 35px; display: flex; flex-direction: column; gap: 15px; z-index: 999; }
         .mini-fab { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer; }
 
