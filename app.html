@@ -29,7 +29,7 @@
             --card-glass: rgba(30, 41, 59, 0.7);
             --primary: #06b6d4; /* Cyan */
             --secondary: #3b82f6; /* Blue */
-            --accent: #f59e0b; /* Orange/Yellow (Estrelas) */
+            --accent: #f59e0b; /* Orange/Yellow */
             --success: #10b981;
             --danger: #ef4444;
             --text-main: #f8fafc;
@@ -43,7 +43,7 @@
         body, html { 
             margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; 
             background: var(--bg-dark); color: var(--text-main); 
-            height: 100%; overflow-x: hidden; 
+            height: 100%; overflow: hidden; /* Importante para o layout fixo */
         }
 
         /* Background Visual */
@@ -53,10 +53,29 @@
             z-index: -1; pointer-events: none;
         }
 
-        /* Estrutura */
-        .main-container { display: flex; flex-direction: column; min-height: 100vh; padding-bottom: 100px; }
+        /* Estrutura Principal Flexível */
+        .main-container { 
+            display: flex; flex-direction: column; 
+            height: 100vh; 
+            position: relative;
+        }
         
-        /* Botões */
+        /* Área Superior Fixa (Carrossel + Busca) */
+        .top-fixed-area {
+            flex-shrink: 0; /* Não encolhe */
+            padding-bottom: 10px;
+            background: linear-gradient(180deg, var(--bg-dark) 80%, transparent 100%);
+            z-index: 10;
+        }
+
+        /* Área de Lista Vertical (Preenche o resto) */
+        .vertical-list-area {
+            flex: 1; /* Ocupa todo o espaço restante */
+            overflow-y: auto; /* Rolagem vertical */
+            padding: 0 20px 100px 20px; /* Padding inferior grande para os botões não cobrirem o fim da lista */
+        }
+
+        /* Botões Gerais */
         .btn-main {
             width: 100%; padding: 16px; border: none; border-radius: 16px;
             background: var(--gradient); color: white; font-weight: 700; font-size: 1rem;
@@ -65,15 +84,7 @@
         }
         .btn-main:active { transform: scale(0.97); opacity: 0.9; }
 
-        .btn-open-week {
-            background: var(--card-glass); border: 1px solid var(--border);
-            margin: 15px 20px; padding: 16px; border-radius: 18px;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            font-weight: 700; color: var(--text-main); cursor: pointer;
-            backdrop-filter: blur(10px);
-        }
-
-        /* Inputs Modernos */
+        /* Inputs */
         .input-premium, .select-boat {
             width: 100%; padding: 16px; border-radius: 14px;
             background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border);
@@ -89,35 +100,43 @@
         }
 
         /* Search Bar */
-        .search-wrapper { margin: 10px 20px; position: relative; z-index: 1005; }
+        .search-wrapper { margin: 10px 20px; position: relative; z-index: 20; }
         .search-bar { width: 100%; background: var(--card-glass); border: 1px solid var(--border); padding: 15px 20px 15px 45px; border-radius: 18px; color: white; font-family: inherit; }
         .search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--primary); }
         
         .search-results-dropdown {
             position: absolute; top: 100%; left: 0; right: 0; margin-top: 5px;
             background: #1e293b; border: 1px solid var(--border); border-radius: 16px;
-            max-height: 250px; overflow-y: auto; display: none; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            max-height: 250px; overflow-y: auto; display: none; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 50;
         }
         .search-item { padding: 12px 15px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; cursor: pointer; }
-        .search-item span:first-child { color: var(--primary); font-weight: 700; font-size: 0.9rem; }
-        .search-item span:last-child { color: var(--text-dim); font-size: 0.75rem; }
 
-        /* Cards */
-        .boat-card {
-            background: var(--card-glass); border-radius: 20px; overflow: hidden;
-            border: 1px solid var(--border); position: relative;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2); height: 100%;
-            display: flex; flex-direction: column;
+        /* Cards Verticais (Novo Layout) */
+        .vertical-boat-card {
+            background: var(--card-glass); 
+            border-radius: 18px; 
+            border: 1px solid var(--border);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
         }
-        .boat-img-container { width: 100%; height: 140px; background: #000; position: relative; }
-        .boat-img { width: 100%; height: 100%; object-fit: cover; }
-        .boat-overlay-name {
-            position: absolute; bottom: 0; left: 0; width: 100%;
-            background: linear-gradient(transparent, rgba(0,0,0,0.9));
-            padding: 20px 10px 8px 10px; font-weight: 800; font-size: 0.8rem;
-            color: white; text-transform: uppercase;
+        
+        .v-boat-img {
+            width: 90px; height: 90px; 
+            border-radius: 12px; 
+            object-fit: cover;
+            background: #0f172a;
         }
-        .route-box { padding: 10px; font-size: 0.75rem; color: var(--text-dim); font-weight: 600; text-align: center; background: rgba(0,0,0,0.2); margin-top: auto; }
+        
+        .v-boat-info { flex: 1; }
+        .v-boat-name { font-weight: 800; font-size: 1rem; color: white; margin-bottom: 4px; }
+        .v-boat-route { font-size: 0.8rem; color: var(--text-dim); display: flex; align-items: center; gap: 5px; }
+        .v-boat-price { font-weight: 700; color: var(--success); font-size: 0.9rem; margin-top: 5px; }
+        .v-boat-tag { position: absolute; top: 10px; right: 10px; font-size: 0.65rem; background: rgba(6,182,212,0.15); color: var(--primary); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(6,182,212,0.3); }
 
         /* Modals */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 3000; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px; }
@@ -131,18 +150,48 @@
         }
         .week-modal.active { display: block; transform: translateY(0); }
 
-        /* Floating Action Button */
-        .fab-container { position: fixed; bottom: 25px; right: 20px; display: flex; flex-direction: column; gap: 12px; z-index: 999; }
-        .fab { width: 56px; height: 56px; border-radius: 18px; border: none; color: white; font-size: 1.4rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(0,0,0,0.4); cursor: pointer; }
+        /* Floating Action Buttons (Novos) */
+        .nav-fabs {
+            position: fixed; bottom: 25px; left: 0; right: 0;
+            padding: 0 25px;
+            display: flex; justify-content: space-between;
+            pointer-events: none; /* Permite clique no fundo */
+            z-index: 1000;
+        }
+        .nav-fab-btn {
+            pointer-events: auto;
+            width: 60px; height: 60px;
+            border-radius: 20px; border: none;
+            color: white; font-size: 1.4rem;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            cursor: pointer; transition: transform 0.2s;
+            position: relative;
+        }
+        .nav-fab-btn:active { transform: scale(0.9); }
+        
+        /* Botão Perfil */
+        .fab-profile { background: #334155; border: 1px solid var(--border); }
+        /* Botão Agenda */
+        .fab-agenda { background: var(--gradient); }
+
+        /* Botões de Ação (Add/Zap) ficarem acima */
+        .action-fabs {
+            position: fixed; bottom: 100px; right: 20px;
+            display: flex; flex-direction: column; gap: 10px;
+            z-index: 999;
+        }
+        .mini-fab {
+            width: 45px; height: 45px; border-radius: 50%;
+            border: none; color: white; font-size: 1.1rem;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer;
+        }
 
         /* Upload Area */
         .new-boat-section { border: 2px dashed var(--border); padding: 15px; border-radius: 16px; background: rgba(255,255,255,0.02); margin-bottom: 20px; display: none; text-align: center; }
         .upload-trigger { width: 100%; height: 120px; border-radius: 12px; background: rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-dim); margin-bottom: 10px; cursor: pointer; position: relative; overflow: hidden; }
 
-        /* Tags e Avaliação */
-        .day-tag { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.6); color: var(--primary); padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; z-index: 10; border: 1px solid var(--border); }
-        .price-tag { position: absolute; top: 10px; right: 10px; background: var(--success); color: #000; padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; z-index: 10; }
-        
         /* Estrelas Interativas */
         .stars-container { display: flex; justify-content: center; gap: 8px; margin: 15px 0; }
         .stars-container i { font-size: 1.5rem; color: #475569; cursor: pointer; transition: color 0.2s; }
@@ -168,7 +217,7 @@
         <i class="fas fa-bullhorn"></i> <span id="alert-text"></span>
     </div>
 
-    <section id="screen-welcome" style="height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:30px; text-align:center;">
+    <section id="screen-welcome" style="height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:30px; text-align:center; overflow-y:auto;">
         <div style="width:80px; height:80px; background:linear-gradient(135deg, var(--primary), var(--secondary)); border-radius:24px; display:flex; align-items:center; justify-content:center; margin-bottom:20px; box-shadow:0 0 30px rgba(6,182,212,0.3);">
             <i class="fas fa-ship" style="font-size:2.5rem; color:white;"></i>
         </div>
@@ -182,56 +231,50 @@
     </section>
 
     <section id="screen-main" style="display:none;" class="main-container">
-        <div style="padding:25px 20px; display:flex; justify-content:space-between; align-items:center;">
-            <div>
-                <span style="font-size:0.8rem; color:var(--text-dim); display:block;">Olá, Passageiro</span>
-                <span style="font-size:1.4rem; font-weight:800; color:white;" id="display-user">Visitante</span>
+        
+        <div class="top-fixed-area">
+            <div style="padding: 15px 20px; display:flex; justify-content:space-between; align-items:center;">
+                <div style="font-weight:800; font-size:1.1rem;">Barco<span style="color:var(--primary)">App</span></div>
+                <div style="font-size:0.8rem; color:var(--text-dim);">Olá, <span id="display-user">Visitante</span></div>
             </div>
-            <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:12px; border:1px solid var(--border);">
-                <i class="fas fa-anchor" style="color:var(--primary)"></i>
-            </div>
-        </div>
 
-        <div style="padding:0 20px;">
-            <div class="swiper-container mySwiper" style="border-radius:20px; overflow:hidden; height:160px; background:#1e293b; box-shadow:0 10px 30px rgba(0,0,0,0.3);">
-                <div class="swiper-wrapper" id="carousel-campaigns"></div>
-                <div class="swiper-pagination"></div>
-            </div>
-        </div>
-
-        <div style="margin:20px; padding:20px; background:var(--card-glass); border-radius:20px; border:1px solid var(--border);">
-            <div style="display:flex; justify-content:space-between; font-size:0.7rem; font-weight:700; margin-bottom:8px;">
-                <span style="color:var(--text-dim);">PONTOS DE FIDELIDADE (Likes)</span>
-                <span style="color:var(--primary);"><b id="total-likes-count">0</b> / 500</span>
-            </div>
-            <div style="height:6px; background:rgba(0,0,0,0.3); border-radius:10px; overflow:hidden;">
-                <div id="thermometer-bar" style="height:100%; width:0%; background:var(--gradient); transition:width 1s;"></div>
-            </div>
-        </div>
-
-        <div class="search-wrapper">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" id="main-search" class="search-bar" placeholder="Buscar barco ou destino..." onkeyup="filterShowcase(this.value)">
-            <div id="search-dropdown" class="search-results-dropdown"></div>
-        </div>
-
-        <div class="btn-open-week" onclick="toggleWeek(true)">
-            <i class="far fa-calendar-alt"></i> VER AGENDA SEMANAL
-        </div>
-
-        <div class="showcase-container">
-            <h3 style="margin:0 0 15px 0; font-size:0.85rem; letter-spacing:1px; color:var(--text-dim); font-weight:800;">EMBARCAÇÕES</h3>
-            <div class="swiper-container showcaseSwiper" style="padding-bottom:20px;">
-                <div class="swiper-wrapper" id="dynamic-showcase-wrapper">
-                    <div style="padding:20px; color:var(--text-dim);">Carregando...</div>
+            <div style="padding:0 20px;">
+                <div class="swiper-container mySwiper" style="border-radius:20px; overflow:hidden; height:160px; background:#1e293b; box-shadow:0 10px 30px rgba(0,0,0,0.3);">
+                    <div class="swiper-wrapper" id="carousel-campaigns"></div>
+                    <div class="swiper-pagination"></div>
                 </div>
             </div>
+
+            <div class="search-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="main-search" class="search-bar" placeholder="Buscar barco ou destino..." onkeyup="filterShowcase(this.value)">
+                <div id="search-dropdown" class="search-results-dropdown"></div>
+            </div>
         </div>
 
-        <div class="fab-container">
-            <button class="fab" style="background:#25d366" onclick="shareApp()"><i class="fab fa-whatsapp"></i></button>
-            <button class="fab" style="background:var(--gradient)" onclick="navigate('screen-register')"><i class="fas fa-plus"></i></button>
+        <div class="vertical-list-area">
+            <h3 style="margin:10px 0 15px 0; font-size:0.85rem; letter-spacing:1px; color:var(--text-dim); font-weight:800; text-transform:uppercase;">Embarcações em Destaque</h3>
+            
+            <div id="dynamic-showcase-wrapper">
+                <div style="padding:20px; color:var(--text-dim); text-align:center;">Carregando escala...</div>
+            </div>
         </div>
+
+        <div class="action-fabs">
+            <button class="mini-fab" style="background:#25d366" onclick="shareApp()"><i class="fab fa-whatsapp"></i></button>
+            <button class="mini-fab" style="background:#3b82f6" onclick="navigate('screen-register')"><i class="fas fa-plus"></i></button>
+        </div>
+
+        <div class="nav-fabs">
+            <button class="nav-fab-btn fab-profile" onclick="openProfileModal()">
+                <i class="fas fa-user"></i>
+            </button>
+
+            <button class="nav-fab-btn fab-agenda" onclick="toggleWeek(true)">
+                <i class="fas fa-calendar-alt"></i>
+            </button>
+        </div>
+
     </section>
 
     <div id="boat-modal" class="modal" onclick="closeModal()">
@@ -292,6 +335,32 @@
         </div>
     </div>
 
+    <div id="profile-modal" class="modal" onclick="document.getElementById('profile-modal').style.display='none'">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div style="padding:25px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h2 style="margin:0; font-size:1.4rem;">Meu Perfil</h2>
+                    <button onclick="document.getElementById('profile-modal').style.display='none'" style="background:none; border:none; color:white; font-size:1.2rem;"><i class="fas fa-times"></i></button>
+                </div>
+
+                <div style="padding:20px; background:var(--card-glass); border-radius:20px; border:1px solid var(--border); margin-bottom:20px;">
+                    <div style="display:flex; justify-content:space-between; font-size:0.7rem; font-weight:700; margin-bottom:8px;">
+                        <span style="color:var(--text-dim);">PONTOS DE FIDELIDADE (Likes)</span>
+                        <span style="color:var(--primary);"><b id="total-likes-count">0</b> / 500</span>
+                    </div>
+                    <div style="height:6px; background:rgba(0,0,0,0.3); border-radius:10px; overflow:hidden;">
+                        <div id="thermometer-bar" style="height:100%; width:0%; background:var(--gradient); transition:width 1s;"></div>
+                    </div>
+                </div>
+
+                <h4 style="margin-bottom:15px; color:var(--text-dim); border-bottom:1px solid var(--border); padding-bottom:5px;">MEU HISTÓRICO DE POSTAGENS</h4>
+                <div id="profile-history-list">
+                    <p style="color:gray; font-size:0.8rem;">Carregando...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="weekModal" class="week-modal">
         <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
             <h3 style="margin:0; font-size:1.3rem;">Escala Semanal</h3>
@@ -305,10 +374,10 @@
             <button onclick="navigate('screen-main')" style="background:none; border:none; color:white; font-size:1.2rem;"><i class="fas fa-arrow-left"></i></button>
             <h2 id="day-title" style="margin:0; text-transform:uppercase; color:var(--primary); font-size:1.1rem;"></h2>
         </div>
-        <div class="feed" id="boat-feed"></div>
+        <div class="feed" id="boat-feed" style="padding-bottom:50px;"></div>
     </section>
 
-    <section id="screen-register" style="display:none; padding:20px; padding-bottom:100px;">
+    <section id="screen-register" style="display:none; padding:20px; padding-bottom:100px; overflow-y:auto; height:100vh;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
             <button onclick="navigate('screen-main')" style="background:rgba(255,255,255,0.1); width:40px; height:40px; border-radius:12px; color:white; border:none;"><i class="fas fa-arrow-left"></i></button>
             <span style="font-weight:800; color:var(--primary); font-size:1.1rem;">NOVA VIAGEM</span>
@@ -385,7 +454,6 @@
             // ESTADO
             let currentUser = JSON.parse(localStorage.getItem('barco_user_data'));
             let currentDayPage = "";
-            let showcaseSwiperInstance = null;
             let allBoatsLocal = [];
             let searchTimeout = null;
             let boatsDB = {}; 
@@ -412,8 +480,7 @@
 
             window.navigate = function(id) {
                 document.querySelectorAll('section').forEach(s => s.style.display = 'none');
-                document.getElementById(id).style.display = id === 'screen-main' ? 'flex' : 'block';
-                window.scrollTo(0,0);
+                document.getElementById(id).style.display = id === 'screen-main' ? 'flex' : 'block'; // main flex
                 if(id === 'screen-register') loadRegisteredBoats();
             }
 
@@ -565,7 +632,7 @@
                 });
             }
 
-            // --- FEEDS & DETAILS ---
+            // --- FEEDS & DETAILS (ATUALIZADO PARA VERTICAL) ---
             function listenDynamicShowcase() {
                 rtdb.ref('barcos').limitToLast(30).on('value', snap => {
                     const w = document.getElementById('dynamic-showcase-wrapper'); w.innerHTML="";
@@ -579,24 +646,26 @@
                             Object.keys(d[day]).forEach(k => {
                                 const b = d[day][k]; b.key = k; b.dia = day;
                                 allBoatsLocal.push(b);
+                                
                                 const div = document.createElement('div');
-                                div.className = 'swiper-slide boat-slide-item';
-                                div.style.width = '200px';
+                                div.className = 'vertical-boat-card';
+                                div.onclick = function() { openDirectDetails(day, k); };
                                 div.innerHTML = `
-                                    <div class="boat-card" onclick="openDirectDetails('${day}','${k}')">
-                                        <div class="day-tag">${day}</div>
-                                        <div class="price-tag">R$ ${b.price_p}</div>
-                                        <div class="boat-img-container"><img src="${b.img}" class="boat-img" loading="lazy"></div>
-                                        <div class="boat-overlay-name">${b.name}</div>
-                                        <div class="route-box">${b.origin} <i class="fas fa-arrow-right" style="color:var(--primary)"></i> ${b.destiny}</div>
-                                    </div>`;
+                                    <div class="v-boat-tag">${day}</div>
+                                    <img src="${b.img}" class="v-boat-img" loading="lazy">
+                                    <div class="v-boat-info">
+                                        <div class="v-boat-name">${b.name}</div>
+                                        <div class="v-boat-route">
+                                            <span>${b.origin}</span> <i class="fas fa-arrow-right" style="font-size:0.7rem;"></i> <span>${b.destiny}</span>
+                                        </div>
+                                        <div class="v-boat-price">Passagem: R$ ${b.price_p}</div>
+                                    </div>
+                                `;
                                 frag.appendChild(div);
                             });
                         }
                     });
                     w.appendChild(frag);
-                    if(showcaseSwiperInstance) showcaseSwiperInstance.destroy();
-                    showcaseSwiperInstance = new Swiper(".showcaseSwiper", { slidesPerView: "auto", spaceBetween: 15, freeMode: true, observer: true, observeParents: true });
                 });
             }
 
@@ -617,7 +686,6 @@
 
             window.selectSearchItem = function(d,k) { document.getElementById('main-search').value=""; document.getElementById('search-dropdown').style.display='none'; openDirectDetails(d,k); }
             
-            // Função wrapper para chamadas do HTML
             window.openDirectDetails = function(d,k) { currentDayPage=d; openDetails(k); }
 
             window.openDetails = function(k) {
@@ -626,7 +694,7 @@
                     if(!b) { openCustomAlert("Publicação não encontrada.", "Erro", "error"); return; }
                     
                     currentOpenBoat = b; 
-                    currentOpenBoat.key = k; // Salva chave para uso posterior (denuncia/voto)
+                    currentOpenBoat.key = k;
                     
                     document.getElementById('modal-img').src = b.img;
                     document.getElementById('modal-name').innerText = b.name;
@@ -697,6 +765,13 @@
                 });
             }
 
+            // --- LÓGICA DO PERFIL E PONTOS ---
+            window.openProfileModal = function() {
+                updateStats(); // Atualiza pontos
+                loadProfileHistory(); // Carrega histórico
+                document.getElementById('profile-modal').style.display = 'flex';
+            }
+
             window.updateStats = function() {
                 rtdb.ref('barcos').once('value', s => {
                     let pts=0; const d=s.val();
@@ -707,6 +782,33 @@
                     });
                     document.getElementById('total-likes-count').innerText = pts;
                     document.getElementById('thermometer-bar').style.width = Math.min((pts/500)*100, 100) + '%';
+                });
+            }
+
+            window.loadProfileHistory = function() {
+                const c = document.getElementById('profile-history-list');
+                c.innerHTML = '<p style="color:gray; font-size:0.8rem;">Buscando...</p>';
+                
+                // Filtra da lista local 'allBoatsLocal' onde registeredBy == currentUser.phone
+                const myBoats = allBoatsLocal.filter(b => b.registeredBy === currentUser.phone);
+                
+                if(myBoats.length === 0) {
+                    c.innerHTML = '<p style="color:#94a3b8; font-size:0.9rem;">Você ainda não postou viagens.</p>';
+                    return;
+                }
+
+                c.innerHTML = '';
+                myBoats.forEach(b => {
+                    const div = document.createElement('div');
+                    div.style.cssText = 'background:rgba(255,255,255,0.05); padding:10px; border-radius:10px; margin-bottom:10px; display:flex; gap:10px; align-items:center;';
+                    div.innerHTML = `
+                        <img src="${b.img}" style="width:50px; height:50px; border-radius:8px; object-fit:cover;">
+                        <div>
+                            <div style="font-weight:700; font-size:0.9rem; color:white;">${b.name}</div>
+                            <div style="font-size:0.75rem; color:#94a3b8;">${b.date} • ${b.likes||0} Likes</div>
+                        </div>
+                    `;
+                    c.appendChild(div);
                 });
             }
 
@@ -721,7 +823,7 @@
                     f.innerHTML=""; const d=s.val();
                     if(d) Object.keys(d).forEach(k => {
                         const b=d[k];
-                        f.innerHTML += `<div class="boat-card" onclick="openDetails('${k}')" style="margin-bottom:15px; height:auto;"><div class="day-tag" style="background:var(--success); color:black;">R$ ${b.price_p}</div><div class="boat-img-container"><img src="${b.img}" class="boat-img" loading="lazy"></div><div class="boat-overlay-name">${b.name}</div><div class="route-box"><span>${b.origin}</span> <i class="fas fa-arrow-right" style="color:var(--primary)"></i> <span>${b.destiny}</span></div></div>`;
+                        f.innerHTML += `<div class="vertical-boat-card" onclick="openDetails('${k}')"><img src="${b.img}" class="v-boat-img" loading="lazy"><div class="v-boat-info"><div class="v-boat-name">${b.name}</div><div class="v-boat-route"><span>${b.origin}</span> <i class="fas fa-arrow-right" style="font-size:0.7rem;"></i> <span>${b.destiny}</span></div><div class="v-boat-price">Passagem: R$ ${b.price_p}</div></div></div>`;
                     }); else f.innerHTML="<p style='padding:20px;color:gray'>Sem viagens.</p>";
                 });
             }
@@ -734,4 +836,3 @@
     </script>
 </body>
 </html>
-
