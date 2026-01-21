@@ -43,7 +43,7 @@
         body, html { 
             margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; 
             background: var(--bg-dark); color: var(--text-main); 
-            height: 100%; overflow: hidden; /* Importante para o layout fixo */
+            height: 100%; overflow: hidden;
         }
 
         /* Background Visual */
@@ -53,34 +53,17 @@
             z-index: -1; pointer-events: none;
         }
 
-        /* Estrutura Principal Flexível */
-        .main-container { 
-            display: flex; flex-direction: column; 
-            height: 100vh; 
-            position: relative;
-        }
+        .main-container { display: flex; flex-direction: column; height: 100vh; position: relative; }
         
-        /* Área Superior Fixa (Carrossel + Busca) */
-        .top-fixed-area {
-            flex-shrink: 0; /* Não encolhe */
-            padding-bottom: 10px;
-            background: linear-gradient(180deg, var(--bg-dark) 80%, transparent 100%);
-            z-index: 10;
-        }
+        .top-fixed-area { flex-shrink: 0; padding-bottom: 10px; background: linear-gradient(180deg, var(--bg-dark) 80%, transparent 100%); z-index: 10; }
 
-        /* Área de Lista Vertical (Preenche o resto) */
-        .vertical-list-area {
-            flex: 1; /* Ocupa todo o espaço restante */
-            overflow-y: auto; /* Rolagem vertical */
-            padding: 0 20px 100px 20px; /* Padding inferior grande para os botões não cobrirem o fim da lista */
-        }
+        .vertical-list-area { flex: 1; overflow-y: auto; padding: 0 15px 120px 15px; }
 
         /* Botões Gerais */
         .btn-main {
             width: 100%; padding: 16px; border: none; border-radius: 16px;
             background: var(--gradient); color: white; font-weight: 700; font-size: 1rem;
-            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.25); cursor: pointer;
-            transition: transform 0.2s;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.25); cursor: pointer; transition: transform 0.2s;
         }
         .btn-main:active { transform: scale(0.97); opacity: 0.9; }
 
@@ -88,16 +71,10 @@
         .input-premium, .select-boat {
             width: 100%; padding: 16px; border-radius: 14px;
             background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border);
-            color: white; font-size: 0.95rem; margin-bottom: 12px;
-            transition: 0.3s;
+            color: white; font-size: 0.95rem; margin-bottom: 12px; transition: 0.3s;
         }
         .input-premium:focus, .select-boat:focus { border-color: var(--primary); background: rgba(15, 23, 42, 0.9); }
-
-        .select-boat {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat; background-position: right 15px center; background-size: 16px;
-            appearance: none;
-        }
+        .select-boat { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; background-size: 16px; appearance: none; }
 
         /* Search Bar */
         .search-wrapper { margin: 10px 20px; position: relative; z-index: 20; }
@@ -111,93 +88,74 @@
         }
         .search-item { padding: 12px 15px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; cursor: pointer; }
 
-        /* Cards Verticais (Novo Layout) */
-        .vertical-boat-card {
-            background: var(--card-glass); 
-            border-radius: 18px; 
-            border: 1px solid var(--border);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            padding: 10px;
+        /* --- NOVO: GRID DUPLO (Layout de Grade) --- */
+        .boats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Duas colunas iguais */
             gap: 15px;
-            position: relative;
-            overflow: hidden;
+            padding-bottom: 20px;
         }
-        
-        .v-boat-img {
-            width: 90px; height: 90px; 
-            border-radius: 12px; 
-            object-fit: cover;
-            background: #0f172a;
+
+        /* Card do Grid (Vertical) */
+        .grid-boat-card {
+            background: var(--card-glass); 
+            border-radius: 20px; 
+            border: 1px solid var(--border);
+            display: flex; flex-direction: column; /* Vertical */
+            overflow: hidden; position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            height: 100%;
         }
-        
-        .v-boat-info { flex: 1; }
-        .v-boat-name { font-weight: 800; font-size: 1rem; color: white; margin-bottom: 4px; }
-        .v-boat-route { font-size: 0.8rem; color: var(--text-dim); display: flex; align-items: center; gap: 5px; }
-        .v-boat-price { font-weight: 700; color: var(--success); font-size: 0.9rem; margin-top: 5px; }
-        .v-boat-tag { position: absolute; top: 10px; right: 10px; font-size: 0.65rem; background: rgba(6,182,212,0.15); color: var(--primary); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(6,182,212,0.3); }
+
+        .grid-boat-img {
+            width: 100%; height: 110px; /* Altura fixa da imagem */
+            object-fit: cover; background: #0f172a;
+        }
+
+        .grid-boat-info { padding: 10px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .grid-boat-name { font-weight: 800; font-size: 0.9rem; color: white; margin-bottom: 4px; line-height: 1.2; }
+        .grid-boat-route { font-size: 0.7rem; color: var(--text-dim); display: flex; align-items: center; gap: 4px; margin-bottom: 6px; }
+        .grid-boat-time { font-size: 0.75rem; color: var(--primary); font-weight: 700; background: rgba(6,182,212,0.1); padding: 4px 8px; border-radius: 6px; display: inline-block; text-align: center; }
+
+        /* Tag Flutuante do Dia (em cima da foto) */
+        .grid-day-tag { position: absolute; top: 8px; left: 8px; font-size: 0.6rem; background: rgba(0,0,0,0.7); color: white; padding: 2px 8px; border-radius: 4px; font-weight: 700; backdrop-filter: blur(2px); }
 
         /* Modals */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 3000; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px; }
         .modal-content { background: #1e293b; width: 100%; max-width: 400px; border-radius: 24px; border: 1px solid var(--border); overflow-y: auto; max-height: 90vh; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        
-        .week-modal {
-            display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 75%;
-            background: #0f172a; border-radius: 30px 30px 0 0; border-top: 1px solid var(--primary);
-            z-index: 2000; padding: 20px; box-shadow: 0 -10px 50px rgba(0,0,0,0.8);
-            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
+        .week-modal { display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 75%; background: #0f172a; border-radius: 30px 30px 0 0; border-top: 1px solid var(--primary); z-index: 2000; padding: 20px; box-shadow: 0 -10px 50px rgba(0,0,0,0.8); transform: translateY(100%); transition: transform 0.3s; }
         .week-modal.active { display: block; transform: translateY(0); }
 
-        /* Floating Action Buttons (Novos) */
+        /* --- BOTÕES FLUTUANTES AUMENTADOS --- */
         .nav-fabs {
-            position: fixed; bottom: 25px; left: 0; right: 0;
-            padding: 0 25px;
+            position: fixed; bottom: 30px; left: 0; right: 0;
+            padding: 0 30px;
             display: flex; justify-content: space-between;
-            pointer-events: none; /* Permite clique no fundo */
-            z-index: 1000;
+            pointer-events: none; z-index: 1000;
         }
         .nav-fab-btn {
             pointer-events: auto;
-            width: 60px; height: 60px;
-            border-radius: 20px; border: none;
-            color: white; font-size: 1.4rem;
+            width: 72px; height: 72px; /* Aumentado de 60px para 72px */
+            border-radius: 24px; border: none;
+            color: white; font-size: 1.8rem; /* Ícone maior */
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            cursor: pointer; transition: transform 0.2s;
-            position: relative;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            cursor: pointer; transition: transform 0.2s; position: relative;
         }
         .nav-fab-btn:active { transform: scale(0.9); }
         
-        /* Botão Perfil */
         .fab-profile { background: #334155; border: 1px solid var(--border); }
-        /* Botão Agenda */
         .fab-agenda { background: var(--gradient); }
 
-        /* Botões de Ação (Add/Zap) ficarem acima */
-        .action-fabs {
-            position: fixed; bottom: 100px; right: 20px;
-            display: flex; flex-direction: column; gap: 10px;
-            z-index: 999;
-        }
-        .mini-fab {
-            width: 45px; height: 45px; border-radius: 50%;
-            border: none; color: white; font-size: 1.1rem;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer;
-        }
+        .action-fabs { position: fixed; bottom: 120px; right: 35px; display: flex; flex-direction: column; gap: 15px; z-index: 999; }
+        .mini-fab { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer; }
 
-        /* Upload Area */
+        /* Outros */
         .new-boat-section { border: 2px dashed var(--border); padding: 15px; border-radius: 16px; background: rgba(255,255,255,0.02); margin-bottom: 20px; display: none; text-align: center; }
         .upload-trigger { width: 100%; height: 120px; border-radius: 12px; background: rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-dim); margin-bottom: 10px; cursor: pointer; position: relative; overflow: hidden; }
-
-        /* Estrelas Interativas */
         .stars-container { display: flex; justify-content: center; gap: 8px; margin: 15px 0; }
         .stars-container i { font-size: 1.5rem; color: #475569; cursor: pointer; transition: color 0.2s; }
         .stars-container i.active { color: var(--accent); }
-
-        /* Alerts */
         .alert-box { background: #1e293b; padding: 25px; border-radius: 20px; border: 1px solid var(--primary); text-align: center; width: 85%; max-width: 300px; }
         .day-row { padding: 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-weight: 600; color: var(--text-dim); cursor: pointer; }
     </style>
@@ -255,8 +213,8 @@
         <div class="vertical-list-area">
             <h3 style="margin:10px 0 15px 0; font-size:0.85rem; letter-spacing:1px; color:var(--text-dim); font-weight:800; text-transform:uppercase;">Embarcações em Destaque</h3>
             
-            <div id="dynamic-showcase-wrapper">
-                <div style="padding:20px; color:var(--text-dim); text-align:center;">Carregando escala...</div>
+            <div id="dynamic-showcase-wrapper" class="boats-grid">
+                <div style="padding:20px; color:var(--text-dim); text-align:center; grid-column: 1 / -1;">Carregando escala...</div>
             </div>
         </div>
 
@@ -269,7 +227,6 @@
             <button class="nav-fab-btn fab-profile" onclick="openProfileModal()">
                 <i class="fas fa-user"></i>
             </button>
-
             <button class="nav-fab-btn fab-agenda" onclick="toggleWeek(true)">
                 <i class="fas fa-calendar-alt"></i>
             </button>
@@ -446,7 +403,7 @@
             }
             const rtdb = firebase.database();
 
-            // LOGIN ANÔNIMO
+            // LOGIN
             firebase.auth().onAuthStateChanged((user) => {
                 if (!user) firebase.auth().signInAnonymously().catch(err => console.error(err));
             });
@@ -480,7 +437,7 @@
 
             window.navigate = function(id) {
                 document.querySelectorAll('section').forEach(s => s.style.display = 'none');
-                document.getElementById(id).style.display = id === 'screen-main' ? 'flex' : 'block'; // main flex
+                document.getElementById(id).style.display = id === 'screen-main' ? 'flex' : 'block';
                 if(id === 'screen-register') loadRegisteredBoats();
             }
 
@@ -625,45 +582,56 @@
                 rtdb.ref('barcos/' + dN).push(trip).then(() => {
                     openCustomAlert("Viagem publicada!");
                     navigate('screen-main');
-                    // Reset
                     document.getElementById('boat-selector').value = "";
                     document.getElementById('selected-boat-preview').style.display = 'none';
                     document.getElementById('new-boat-form').style.display = 'none';
                 });
             }
 
-            // --- FEEDS & DETAILS (ATUALIZADO PARA VERTICAL) ---
+            // --- FEEDS & DETAILS (GRID + ORDENAÇÃO) ---
             function listenDynamicShowcase() {
                 rtdb.ref('barcos').limitToLast(30).on('value', snap => {
                     const w = document.getElementById('dynamic-showcase-wrapper'); w.innerHTML="";
                     allBoatsLocal = [];
                     const d = snap.val();
-                    if(!d) { w.innerHTML = '<div style="padding:20px; color:gray">Nenhuma viagem agendada.</div>'; return; }
+                    if(!d) { w.innerHTML = '<div style="padding:20px; color:gray; grid-column:1/-1; text-align:center;">Nenhuma viagem agendada.</div>'; return; }
                     
-                    const frag = document.createDocumentFragment();
+                    // 1. Flatten Data (Transformar em lista única)
                     Object.keys(d).forEach(day => {
                         if(d[day]) {
                             Object.keys(d[day]).forEach(k => {
                                 const b = d[day][k]; b.key = k; b.dia = day;
                                 allBoatsLocal.push(b);
-                                
-                                const div = document.createElement('div');
-                                div.className = 'vertical-boat-card';
-                                div.onclick = function() { openDirectDetails(day, k); };
-                                div.innerHTML = `
-                                    <div class="v-boat-tag">${day}</div>
-                                    <img src="${b.img}" class="v-boat-img" loading="lazy">
-                                    <div class="v-boat-info">
-                                        <div class="v-boat-name">${b.name}</div>
-                                        <div class="v-boat-route">
-                                            <span>${b.origin}</span> <i class="fas fa-arrow-right" style="font-size:0.7rem;"></i> <span>${b.destiny}</span>
-                                        </div>
-                                        <div class="v-boat-price">Passagem: R$ ${b.price_p}</div>
-                                    </div>
-                                `;
-                                frag.appendChild(div);
                             });
                         }
+                    });
+
+                    // 2. Sort Logic (Ordenação por Data)
+                    allBoatsLocal.sort((a, b) => {
+                        // Cria objetos Date combinando data (YYYY-MM-DD) e hora (HH:MM)
+                        const dateA = new Date(a.date + 'T' + a.time);
+                        const dateB = new Date(b.date + 'T' + b.time);
+                        return dateA - dateB; // Crescente (Mais perto primeiro)
+                    });
+
+                    // 3. Render
+                    const frag = document.createDocumentFragment();
+                    allBoatsLocal.forEach(b => {
+                        const div = document.createElement('div');
+                        div.className = 'grid-boat-card';
+                        div.onclick = function() { openDirectDetails(b.dia, b.key); };
+                        div.innerHTML = `
+                            <div class="grid-day-tag">${b.dia}</div>
+                            <img src="${b.img}" class="grid-boat-img" loading="lazy">
+                            <div class="grid-boat-info">
+                                <div class="grid-boat-name">${b.name}</div>
+                                <div class="grid-boat-route">
+                                    <span>${b.origin}</span> <i class="fas fa-arrow-right" style="font-size:0.6rem;"></i> <span>${b.destiny}</span>
+                                </div>
+                                <div class="grid-boat-time">${b.time}</div>
+                            </div>
+                        `;
+                        frag.appendChild(div);
                     });
                     w.appendChild(frag);
                 });
@@ -715,7 +683,7 @@
                     for(let i=1; i<=5; i++) { const s = document.getElementById('s'+i); s.className = "far fa-star"; s.style.color = "#475569"; }
                     document.getElementById('modal-rating-avg').innerText = "0.0";
 
-                    // Carregar Média Estrelas
+                    // Carregar Média
                     if(b.boatId) {
                         rtdb.ref(`barco_avaliacoes/${b.boatId}`).once('value', snap => {
                             const r = snap.val();
@@ -726,7 +694,6 @@
                             }
                         });
                     }
-
                     document.getElementById('boat-modal').style.display='flex';
                 });
             }
@@ -765,10 +732,10 @@
                 });
             }
 
-            // --- LÓGICA DO PERFIL E PONTOS ---
+            // --- PERFIL ---
             window.openProfileModal = function() {
-                updateStats(); // Atualiza pontos
-                loadProfileHistory(); // Carrega histórico
+                updateStats(); 
+                loadProfileHistory(); 
                 document.getElementById('profile-modal').style.display = 'flex';
             }
 
@@ -788,15 +755,11 @@
             window.loadProfileHistory = function() {
                 const c = document.getElementById('profile-history-list');
                 c.innerHTML = '<p style="color:gray; font-size:0.8rem;">Buscando...</p>';
-                
-                // Filtra da lista local 'allBoatsLocal' onde registeredBy == currentUser.phone
                 const myBoats = allBoatsLocal.filter(b => b.registeredBy === currentUser.phone);
-                
                 if(myBoats.length === 0) {
                     c.innerHTML = '<p style="color:#94a3b8; font-size:0.9rem;">Você ainda não postou viagens.</p>';
                     return;
                 }
-
                 c.innerHTML = '';
                 myBoats.forEach(b => {
                     const div = document.createElement('div');
@@ -823,7 +786,7 @@
                     f.innerHTML=""; const d=s.val();
                     if(d) Object.keys(d).forEach(k => {
                         const b=d[k];
-                        f.innerHTML += `<div class="vertical-boat-card" onclick="openDetails('${k}')"><img src="${b.img}" class="v-boat-img" loading="lazy"><div class="v-boat-info"><div class="v-boat-name">${b.name}</div><div class="v-boat-route"><span>${b.origin}</span> <i class="fas fa-arrow-right" style="font-size:0.7rem;"></i> <span>${b.destiny}</span></div><div class="v-boat-price">Passagem: R$ ${b.price_p}</div></div></div>`;
+                        f.innerHTML += `<div style="background:var(--card-glass);border-radius:18px;border:1px solid var(--border);margin-bottom:15px;display:flex;align-items:center;padding:10px;gap:15px;overflow:hidden;position:relative;" onclick="openDetails('${k}')"><img src="${b.img}" style="width:90px;height:90px;border-radius:12px;object-fit:cover;"><div style="flex:1;"><div style="font-weight:800;color:white;margin-bottom:4px;">${b.name}</div><div style="font-size:0.8rem;color:var(--text-dim);display:flex;align-items:center;gap:5px;"><span>${b.origin}</span> <i class="fas fa-arrow-right" style="font-size:0.7rem;"></i> <span>${b.destiny}</span></div><div style="font-weight:700;color:var(--success);font-size:0.9rem;margin-top:5px;">R$ ${b.price_p}</div></div></div>`;
                     }); else f.innerHTML="<p style='padding:20px;color:gray'>Sem viagens.</p>";
                 });
             }
